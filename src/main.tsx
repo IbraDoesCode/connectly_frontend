@@ -4,10 +4,13 @@ import "./index.css";
 import App from "./App.tsx";
 import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
+import { Notifications } from "@mantine/notifications";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <MantineProvider forceColorScheme="dark">
+      <Notifications />
       <App />
     </MantineProvider>
   </StrictMode>
