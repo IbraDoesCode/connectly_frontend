@@ -1,14 +1,46 @@
 import { NavLink, Stack } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import {
   IconHome,
   IconLogout,
   IconSettings,
   IconUser,
 } from "@tabler/icons-react";
+import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import apiClient from "../util/apiClient";
 
 const Sidebar = () => {
   const navigate = useNavigate();
+
+  const { mutate: logout } = useMutation({
+    mutationFn: async () => {
+      const res = await apiClient.post("/logout/", {
+        refresh: localStorage.getItem("refresh"),
+      });
+
+      return res.data;
+    },
+    onSuccess: () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("refresh");
+
+      notifications.show({
+        title: "Authentication",
+        message: "Logout success!",
+        color: "green",
+      });
+
+      navigate("/login");
+    },
+    onError: (error) => {
+      notifications.show({
+        title: "Authentication",
+        message: error.message,
+        color: "red",
+      });
+    },
+  });
 
   return (
     <div className="md:flex-[2_2_0] w-18 max-w-52">
@@ -34,7 +66,7 @@ const Sidebar = () => {
         </Stack>
 
         <NavLink
-          onClick={() => navigate("/login")}
+          onClick={() => logout()}
           label={<span className="hidden md:block">Logout</span>}
           leftSection={<IconLogout className="w-6 h-6 mx-auto md:mx-0" />}
           className="flex flex-col items-center md:flex-row md:items-center"
