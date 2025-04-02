@@ -9,26 +9,64 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { GoogleButton } from "../components/GoogleButton";
 import { useForm } from "@mantine/form";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import apiClient from "../util/apiClient";
+import { AxiosError } from "axios";
+
+interface LoginCredentials {
+  username: string;
+  password: string;
+}
 
 const Login = () => {
   const navigate = useNavigate();
+
   const form = useForm({
     initialValues: {
-      email: "",
+      username: "",
       password: "",
     },
 
     validate: {
-      email: (val) => (/^\S+@\S+$/.test(val) ? null : "Invalid email"),
       password: (val) =>
         val.length <= 6
           ? "Password should include at least 6 characters"
           : null,
     },
   });
+
+  const { mutate: login, isPending } = useMutation({
+    mutationFn: async ({ username, password }: LoginCredentials) => {
+      const res = await apiClient.post("/token/", {
+        username,
+        password,
+      });
+
+      return res.data;
+    },
+    onSuccess: (data) => {
+      localStorage.setItem("token", data.access);
+      localStorage.setItem("refresh", data.refresh);
+      notifications.show({
+        title: "Authentication",
+        message: "Login success!",
+        color: "green",
+      });
+      navigate("/");
+    },
+    onError: (error: AxiosError<{ detail?: string }>) => {
+      notifications.show({
+        title: "Authentication",
+        message: error.response?.data?.detail,
+        color: "red",
+      });
+    },
+  });
+
   return (
     <div className="flex flex-col justify-center items-center h-screen">
       <Paper w={420} radius="md" p="xl" withBorder>
@@ -46,19 +84,15 @@ const Login = () => {
           my="lg"
         />
 
-        <form
-          onSubmit={form.onSubmit(() => {
-            navigate("/");
-          })}
-        >
+        <form onSubmit={form.onSubmit((values) => login(values))}>
           <Stack>
             <TextInput
               required
-              label="Email"
-              placeholder="youremail@email.com"
-              value={form.values.email}
+              label="Username"
+              placeholder="your username"
+              value={form.values.username}
               onChange={(event) =>
-                form.setFieldValue("email", event.currentTarget.value)
+                form.setFieldValue("username", event.currentTarget.value)
               }
               radius="md"
             />
@@ -90,7 +124,7 @@ const Login = () => {
               Don't have an account? Register
             </Anchor>
 
-            <Button type="submit" radius="xl">
+            <Button type="submit" radius="xl" loading={isPending}>
               Login
             </Button>
           </Group>
