@@ -73,7 +73,7 @@ const Profile = () => {
           </Stack>
 
           {/* Follow Button */}
-          <Button size="sm" variant="outline" radius="lg">
+          <Button size="sm" variant="outline" radius="xl">
             Follow
           </Button>
         </Group>
