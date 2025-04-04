@@ -8,13 +8,44 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("access");
-    console.log(`Token retreived from localstorage: ${token}`);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add interceptor to refresh token
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response.status === 403 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const refreshToken = localStorage.getItem("refresh");
+        const res = await apiClient.post("/token/refresh/", {
+          refresh: refreshToken,
+        });
+
+        const { access, refresh: newRefresh } = res.data;
+        localStorage.setItem("access", access);
+        localStorage.setItem("refresh", newRefresh);
+
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${access}`;
+        return apiClient(originalRequest);
+      } catch (error) {
+        console.error("Token refresh failed:", error);
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
+        window.location.href = "/";
+        return Promise.reject(error);
+      }
+    }
     return Promise.reject(error);
   }
 );
