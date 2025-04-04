@@ -11,22 +11,67 @@ import {
   CloseButton,
 } from "@mantine/core";
 import { IconPhotoPlus, IconUsers, IconWorld } from "@tabler/icons-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import apiClient from "../api/apiClient";
+import { notifications } from "@mantine/notifications";
+import { AxiosError } from "axios";
 
 const NewPost = () => {
   const [text, setText] = useState("");
-  const [image, setImage] = useState(null);
-  const imgRef = useRef(null);
+  const [image, setImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const imgRef = useRef<HTMLInputElement | null>(null);
   const [privacy, setPrivacy] = useState("public");
 
-  const handleImgChange = (e) => {
-    const file = e.target.files[0];
+  const queryClient = useQueryClient();
+
+  const { mutate: post, isPending } = useMutation({
+    mutationFn: async (formData: FormData) => {
+      console.log(formData);
+      const res = await apiClient.post("/posts/", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return res.data;
+    },
+    onSuccess: () => {
+      setText("");
+      setImage(null);
+      setPreview(null);
+      queryClient.invalidateQueries({ queryKey: ["feed"] });
+
+      notifications.show({
+        title: "Success",
+        message: "Post created!",
+        color: "green",
+      });
+    },
+    onError: (error: AxiosError) => {
+      notifications.show({
+        title: "Error",
+        message: error.message,
+        color: "red",
+      });
+    },
+  });
+
+  const handleImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
     }
+  };
+
+  const handleSubmit = () => {
+    const formData = new FormData();
+    formData.append("content", text);
+    formData.append("privacy_type", privacy);
+    if (image) {
+      formData.append("post_type", "image");
+      formData.append("media_files", image);
+    }
+
+    post(formData);
   };
 
   return (
@@ -45,13 +90,16 @@ const NewPost = () => {
           />
 
           {/* Image Preview */}
-          {image && (
+          {preview && (
             <div className="relative w-72 mx-auto mt-2">
               <CloseButton
                 className="absolute top-2 right-2 bg-gray-800 rounded-full"
-                onClick={() => setImage(null)}
+                onClick={() => {
+                  setImage(null);
+                  setPreview(null);
+                }}
               />
-              <Image src={image} radius="md" />
+              <Image src={preview} radius="md" />
             </div>
           )}
 
@@ -62,7 +110,7 @@ const NewPost = () => {
               <ActionIcon
                 variant="transparent"
                 color="blue"
-                onClick={() => imgRef.current.click()}
+                onClick={() => imgRef.current?.click()}
               >
                 <IconPhotoPlus size={18} />
               </ActionIcon>
@@ -77,7 +125,7 @@ const NewPost = () => {
                 variant="transparent"
                 color="blue"
                 onClick={() =>
-                  setPrivacy(privacy === "public" ? "private" : "public")
+                  setPrivacy(privacy === "public" ? "followers" : "public")
                 }
               >
                 {privacy === "public" ? (
@@ -88,7 +136,13 @@ const NewPost = () => {
               </ActionIcon>
             </Group>
 
-            <Button radius="xl" variant="outline" disabled={!text && !image}>
+            <Button
+              radius="xl"
+              variant="outline"
+              disabled={!text && !image}
+              loading={isPending}
+              onClick={handleSubmit}
+            >
               Post
             </Button>
           </Group>
