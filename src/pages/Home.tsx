@@ -4,7 +4,7 @@ import Feed from "../components/Feed";
 import NewPost from "../components/NewPost";
 
 const Home = () => {
-  const [feedType, setFeedType] = useState("forYou");
+  const [feedType, setFeedType] = useState<"public" | "following">("public");
 
   return (
     <div className="flex-1 w-full">
@@ -12,7 +12,7 @@ const Home = () => {
         feedType={feedType}
         setFeedType={setFeedType}
         data={[
-          { label: "For You", value: "forYou" },
+          { label: "Public", value: "public" },
           { label: "Following", value: "following" },
         ]}
       />
