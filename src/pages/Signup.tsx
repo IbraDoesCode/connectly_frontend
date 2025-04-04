@@ -14,7 +14,7 @@ import { useForm, isEmail } from "@mantine/form";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
-import apiClient from "../util/apiClient";
+import apiClient from "../api/apiClient";
 import { AxiosError } from "axios";
 import React from "react";
 
@@ -68,12 +68,12 @@ const Signup = () => {
         password: userData.password,
       });
 
+      localStorage.setItem("access", res.data.access);
+      localStorage.setItem("refresh", res.data.refresh);
+
       return res.data;
     },
-    onSuccess: (data) => {
-      localStorage.setItem("token", data.access);
-      localStorage.setItem("refresh", data.refresh);
-
+    onSuccess: () => {
       notifications.show({
         title: "Authentication",
         message: "Sign up successful!",
@@ -81,7 +81,7 @@ const Signup = () => {
         color: "green",
       });
 
-      navigate("/");
+      navigate("/home");
     },
     onError: (error: AxiosError<{ username?: string[]; email?: string[] }>) => {
       let errorMessage = "Something went wrong. Please try again.";
