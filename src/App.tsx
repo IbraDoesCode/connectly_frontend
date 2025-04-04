@@ -13,12 +13,13 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
-          <Route path="/" element={<Layout />}>
+          <Route path="/" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+
+          <Route path="/home" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="profile/" element={<Profile />} />
           </Route>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
         </Routes>
       </Router>
     </QueryClientProvider>
