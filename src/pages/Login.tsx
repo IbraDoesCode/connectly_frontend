@@ -9,18 +9,10 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
 import { GoogleButton } from "../components/GoogleButton";
 import { useForm } from "@mantine/form";
 import { useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
-import apiClient from "../api/apiClient";
-import { AxiosError } from "axios";
-
-interface LoginCredentials {
-  username: string;
-  password: string;
-}
+import { useAuth } from "../hooks/useAuth";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -39,34 +31,7 @@ const Login = () => {
     },
   });
 
-  const { mutate: login, isPending } = useMutation({
-    mutationFn: async ({ username, password }: LoginCredentials) => {
-      const res = await apiClient.post("/token/", {
-        username,
-        password,
-      });
-
-      localStorage.setItem("access", res.data.access);
-      localStorage.setItem("refresh", res.data.refresh);
-
-      return res.data;
-    },
-    onSuccess: () => {
-      notifications.show({
-        title: "Authentication",
-        message: "Login success!",
-        color: "green",
-      });
-      navigate("/home");
-    },
-    onError: (error: AxiosError<{ detail?: string }>) => {
-      notifications.show({
-        title: "Authentication",
-        message: error.response?.data?.detail,
-        color: "red",
-      });
-    },
-  });
+  const { login, isLoggingIn } = useAuth();
 
   return (
     <div className="flex flex-col justify-center items-center h-screen">
@@ -125,7 +90,7 @@ const Login = () => {
               Don't have an account? Register
             </Anchor>
 
-            <Button type="submit" radius="xl" loading={isPending}>
+            <Button type="submit" radius="xl" loading={isLoggingIn}>
               Login
             </Button>
           </Group>
