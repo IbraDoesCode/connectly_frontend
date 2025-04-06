@@ -1,46 +1,17 @@
 import { NavLink, Stack } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
 import {
   IconHome,
   IconLogout,
   IconSettings,
   IconUser,
 } from "@tabler/icons-react";
-import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import apiClient from "../api/apiClient";
+import { useAuth } from "../hooks/useAuth";
 
 const Sidebar = () => {
   const navigate = useNavigate();
 
-  const { mutate: logout } = useMutation({
-    mutationFn: async () => {
-      const res = await apiClient.post("/logout/", {
-        refresh: localStorage.getItem("refresh"),
-      });
-
-      localStorage.removeItem("access");
-      localStorage.removeItem("refresh");
-
-      return res.data;
-    },
-    onSuccess: () => {
-      notifications.show({
-        title: "Authentication",
-        message: "Logout success!",
-        color: "green",
-      });
-
-      navigate("/");
-    },
-    onError: (error) => {
-      notifications.show({
-        title: "Authentication",
-        message: error.message,
-        color: "red",
-      });
-    },
-  });
+  const { logout } = useAuth();
 
   return (
     <div className="md:flex-[2_2_0] w-18 max-w-52">
