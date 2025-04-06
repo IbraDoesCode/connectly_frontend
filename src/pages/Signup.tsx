@@ -12,18 +12,7 @@ import {
 import { GoogleButton } from "../components/GoogleButton";
 import { useForm, isEmail } from "@mantine/form";
 import { useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
-import { notifications } from "@mantine/notifications";
-import apiClient from "../api/apiClient";
-import { AxiosError } from "axios";
-import React from "react";
-
-interface SignupData {
-  fullname: string;
-  username: string;
-  email: string;
-  password: string;
-}
+import { useAuth } from "../hooks/useAuth";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -54,60 +43,20 @@ const Signup = () => {
     },
   });
 
-  const { mutate: signup, isPending } = useMutation({
-    mutationFn: async (userData: SignupData) => {
-      const [first_name, ...lastNameParts] = userData.fullname
-        .trim()
-        .split(/\s+/);
-      const last_name = lastNameParts.join(" ");
-      const res = await apiClient.post("/users/register/", {
-        first_name,
-        last_name,
-        username: userData.username,
-        email: userData.email,
-        password: userData.password,
-      });
+  const { signup, isSigningUp } = useAuth();
 
-      localStorage.setItem("access", res.data.access);
-      localStorage.setItem("refresh", res.data.refresh);
+  const handleSubmit = () => {
+    const nameParts = form.values.fullname.trim().split(/\s+/);
+    const first_name = nameParts[0];
+    const last_name = nameParts.slice(1).join(" ");
 
-      return res.data;
-    },
-    onSuccess: () => {
-      notifications.show({
-        title: "Authentication",
-        message: "Sign up successful!",
-        position: "top-right",
-        color: "green",
-      });
-
-      navigate("/home");
-    },
-    onError: (error: AxiosError<{ username?: string[]; email?: string[] }>) => {
-      let errorMessage = "Something went wrong. Please try again.";
-
-      if (error.response?.data.username) {
-        errorMessage = error.response?.data.username[0];
-      } else if (error.response?.data.email) {
-        errorMessage = error.response?.data.email[0];
-      }
-
-      notifications.show({
-        title: "Signup Failed",
-        message: errorMessage,
-        position: "top-right",
-        color: "red",
-      });
-    },
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const validation = form.validate();
-
-    if (Object.keys(validation.errors).length === 0) {
-      signup(form.values);
-    }
+    signup({
+      first_name,
+      last_name,
+      username: form.values.username.trim(),
+      email: form.values.email.trim(),
+      password: form.values.password,
+    });
   };
 
   return (
@@ -191,7 +140,7 @@ const Signup = () => {
               Already have an account? Login
             </Anchor>
 
-            <Button type="submit" radius="xl" loading={isPending}>
+            <Button type="submit" radius="xl" loading={isSigningUp}>
               Sign Up
             </Button>
           </Group>
