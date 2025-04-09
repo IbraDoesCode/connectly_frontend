@@ -71,7 +71,7 @@ export const useAuth = () => {
         message: "Logout success!",
         color: "green",
       });
-      queryClient.removeQueries({ queryKey: ["feed"], exact: false });
+      queryClient.clear();
       navigate("/");
     },
     onError: (error) => {
