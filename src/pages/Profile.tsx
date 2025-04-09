@@ -1,29 +1,32 @@
 import { Avatar, Button, Card, Group, Stack, Text, Title } from "@mantine/core";
-import {
-  IconArrowLeft,
-  IconCalendar,
-  IconLink,
-  IconEdit,
-} from "@tabler/icons-react";
-import { Link } from "react-router-dom";
-import FeedTypeSelector from "../components/FeedTypeSelector";
-import { useState } from "react";
-import Feed from "../components/Feed";
+import { IconArrowLeft, IconCalendar, IconEdit } from "@tabler/icons-react";
+import { Link, useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { getProfileApi } from "../api/profiles";
 
 const Profile = () => {
-  const [feedType, setFeedType] = useState("posts");
-  const isMyProfile = false;
+  const { userId } = useParams();
+
+  const { data: profile, isLoading } = useQuery({
+    queryKey: ["profile", userId],
+    queryFn: () => getProfileApi(userId!),
+    enabled: !!userId,
+  });
+
+  const isMyProfile = userId === "me";
+
+  if (isLoading) return <div>Loading profile...</div>;
 
   return (
     <>
       <Card shadow="sm" padding="lg" radius="md" mb="md" withBorder>
         {/* Header */}
         <Group gap="md" mb="md">
-          <Link to="/">
+          <Link to="/home">
             <IconArrowLeft size={18} />
           </Link>
           <Stack gap={0}>
-            <Title order={3}>Username</Title>
+            <Title order={3}>{profile?.username}</Title>
             <Text size="sm" c="dimmed">
               100 posts
             </Text>
@@ -38,13 +41,11 @@ const Profile = () => {
             style={{ position: "relative", overflow: "hidden" }}
           >
             <img
-              src=""
               alt="Cover"
               style={{
                 width: "100%",
                 height: 200,
                 objectFit: "cover",
-                borderRadius: "8px",
               }}
             />
             {isMyProfile && (
@@ -61,37 +62,39 @@ const Profile = () => {
         </div>
 
         {/* Avatar & Info */}
-        <Avatar src="/avatar-placeholder.png" size={80} radius="xl" my="md" />
+        <Avatar size={80} radius="xl" my="md" />
         <Group justify="space-between" px={4}>
           <Stack gap={0}>
             <Text size="xl" fw={700}>
-              Full name
+              {profile?.full_name}
             </Text>
             <Text size="sm" c="dimmed">
-              @username
+              {profile?.username}
             </Text>
           </Stack>
 
           {/* Follow Button */}
-          <Button size="sm" variant="outline" radius="xl">
-            Follow
-          </Button>
+          {!isMyProfile && (
+            <Button size="sm" variant="outline" radius="xl">
+              Follow
+            </Button>
+          )}
         </Group>
 
         {/* Bio */}
-        <Text mt="md"> This is a user bio. </Text>
+        <Text mt="md"> {profile?.bio} </Text>
 
         {/* Link and date joined */}
         <Group gap="xs" mt="md">
-          <Group gap={4}>
+          {/* <Group gap={4}>
             <IconLink size={14} />
             <Text component="a" href="" target="_blank" size="sm" c="blue">
               www.google.com
             </Text>
-          </Group>
+          </Group> */}
           <Group gap={4}>
             <IconCalendar size={14} />
-            <Text size="sm" color="dimmed">
+            <Text size="sm" c="dimmed">
               Joined January 2023
             </Text>
           </Group>
@@ -107,16 +110,6 @@ const Profile = () => {
           </Text>
         </Group>
       </Card>
-
-      <FeedTypeSelector
-        feedType={feedType}
-        setFeedType={setFeedType}
-        data={[
-          { label: "Posts", value: "posts" },
-          { label: "Likes", value: "likes" },
-        ]}
-      />
-      <Feed feedType={feedType} />
     </>
   );
 };
