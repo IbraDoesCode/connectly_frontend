@@ -24,7 +24,7 @@ const Sidebar = () => {
             className="flex flex-col items-center md:flex-row md:items-center"
           />
           <NavLink
-            onClick={() => navigate("/home/profile")}
+            onClick={() => navigate(`/home/profile/me/`)}
             label={<span className="hidden md:block">Profile</span>}
             leftSection={<IconUser className="w-6 h-6 mx-auto md:mx-0" />}
             className="flex flex-col items-center md:flex-row md:items-center"
