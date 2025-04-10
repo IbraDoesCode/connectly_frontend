@@ -21,3 +21,9 @@ export const likePostApi = async (postId: number) => {
 
   return res.data;
 };
+
+export const deletePostApi = async (postId: number) => {
+  const res = await apiClient.delete(`/posts/${postId}/`);
+
+  return res.data;
+};
