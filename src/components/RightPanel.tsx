@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { getSuggestedProfilesApi } from "../api/profiles";
 import { IProfile } from "../types/Profile";
+import { useFollow } from "../hooks/useFollow";
 
 const RightPanel = () => {
   const navigate = useNavigate();
@@ -11,6 +12,8 @@ const RightPanel = () => {
     queryKey: ["suggested-profiles"],
     queryFn: getSuggestedProfilesApi,
   });
+
+  const { follow, isFollowing } = useFollow();
 
   return (
     <div className="hidden lg:block my-4 mx-2 sticky top-2">
@@ -36,7 +39,12 @@ const RightPanel = () => {
                   </span>
                 </div>
               </div>
-              <Button radius="xl" variant="outline">
+              <Button
+                radius="xl"
+                variant="outline"
+                loading={isFollowing}
+                onClick={() => follow(profile.id)}
+              >
                 Follow
               </Button>
             </div>
