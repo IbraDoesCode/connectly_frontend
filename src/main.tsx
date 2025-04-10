@@ -6,12 +6,15 @@ import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 import { Notifications } from "@mantine/notifications";
+import { ModalsProvider } from "@mantine/modals";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <MantineProvider forceColorScheme="dark">
       <Notifications />
-      <App />
+      <ModalsProvider>
+        <App />
+      </ModalsProvider>
     </MantineProvider>
   </StrictMode>
 );
