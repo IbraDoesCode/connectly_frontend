@@ -1,6 +1,7 @@
 export interface IPost {
   id: number;
   author: {
+    id: string;
     username: string;
     full_name: string;
     avatar_url?: string;
