@@ -11,3 +11,8 @@ export const getProfileApi = async (userId: string) => {
 
   return res.data;
 };
+
+export const followUserApi = async (userId: string) => {
+  const res = await apiClient.post(`profiles/${userId}/follow/`);
+  return res.data;
+};
