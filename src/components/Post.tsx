@@ -5,9 +5,14 @@ import {
   Divider,
   Group,
   Image,
+  Menu,
+  MenuDropdown,
+  MenuItem,
+  MenuTarget,
   Modal,
   Text,
 } from "@mantine/core";
+import { modals } from "@mantine/modals";
 import { useDisclosure } from "@mantine/hooks";
 import {
   IconMessageCircle,
@@ -18,8 +23,10 @@ import { Link } from "react-router-dom";
 import { IPost } from "../types/Post";
 import { format } from "timeago.js";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { likePostApi } from "../api/post";
+import { deletePostApi, likePostApi } from "../api/post";
 import { useState } from "react";
+import { useAuth } from "../hooks/useAuth";
+import { notifications } from "@mantine/notifications";
 
 interface PostProps {
   post: IPost;
@@ -28,8 +35,9 @@ interface PostProps {
 const Post = ({ post }: PostProps) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [isLiked, setIsLiked] = useState(post.is_liked);
+  const { authenticatedUser } = useAuth();
 
-  const isAuthor = false; // TODO: Implement later
+  const isAuthor = post.author.id === authenticatedUser?.id;
 
   const firstMedia =
     post.media && post.media.length > 0 ? post.media[0].url : null;
@@ -45,12 +53,39 @@ const Post = ({ post }: PostProps) => {
     },
   });
 
+  const { mutate: deletePost } = useMutation({
+    mutationFn: deletePostApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["feed"] });
+      notifications.show({
+        title: "Success",
+        message: "The post has been deleted successfully.",
+        color: "green",
+      });
+    },
+  });
+
+  const handleDelete = (postId: number) => {
+    modals.openConfirmModal({
+      title: "Delete your post",
+      children: (
+        <Text>
+          Are you sure you want to delete this post? This action is
+          irreversible.
+        </Text>
+      ),
+      labels: { confirm: "Delete", cancel: "Cancel" },
+      confirmProps: { color: "red" },
+      onConfirm: () => deletePost(postId),
+    });
+  };
+
   return (
     <>
       <Card className="border border-gray-700 rounded-md p-4">
         <Group align="start" gap="xs">
           {/* Avatar */}
-          <Link to={`/profile/${post.author.username}`}>
+          <Link to={`/home/profile/${post.author.id}`}>
             <Avatar src={post.author.avatar_url} radius="xl" />
           </Link>
 
@@ -63,10 +98,22 @@ const Post = ({ post }: PostProps) => {
                 {format(post.created_at)}
               </Text>
               {isAuthor && (
-                <IconDotsVertical
-                  className="ml-auto cursor-pointer"
-                  size={16}
-                />
+                <Menu position="bottom-end">
+                  <MenuTarget>
+                    <ActionIcon variant="transparent" className="ml-auto">
+                      <IconDotsVertical size={16} />
+                    </ActionIcon>
+                  </MenuTarget>
+
+                  <MenuDropdown>
+                    <MenuItem onClick={() => console.log("Edit", post.id)}>
+                      Edit Post
+                    </MenuItem>
+                    <MenuItem color="red" onClick={() => handleDelete(post.id)}>
+                      Delete Post
+                    </MenuItem>
+                  </MenuDropdown>
+                </Menu>
               )}
             </Group>
 
