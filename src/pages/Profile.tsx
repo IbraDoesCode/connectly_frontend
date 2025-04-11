@@ -3,9 +3,15 @@ import { IconArrowLeft, IconCalendar, IconEdit } from "@tabler/icons-react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getProfileApi } from "../api/profiles";
+import { useFollow } from "../hooks/useFollow";
+import { useEffect, useState } from "react";
 
 const Profile = () => {
   const { userId } = useParams();
+  const { follow } = useFollow();
+
+  const [isFollowing, setIsFollowing] = useState(false);
+  const isMyProfile = userId === "me";
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile", userId],
@@ -13,9 +19,18 @@ const Profile = () => {
     enabled: !!userId,
   });
 
-  const isMyProfile = userId === "me";
+  useEffect(() => {
+    if (profile?.is_following !== undefined) {
+      setIsFollowing(profile.is_following);
+    }
+  }, [profile?.is_following, profile, isLoading]);
 
-  if (isLoading) return <div>Loading profile...</div>;
+  if (isLoading || !profile) return <div>Loading profile...</div>;
+
+  const dateJoined = new Date(profile.created_at).toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
 
   return (
     <>
@@ -75,8 +90,16 @@ const Profile = () => {
 
           {/* Follow Button */}
           {!isMyProfile && (
-            <Button size="sm" variant="outline" radius="xl">
-              Follow
+            <Button
+              size="sm"
+              variant="outline"
+              radius="xl"
+              onClick={() => {
+                follow(profile.id);
+                setIsFollowing((prev) => !prev);
+              }}
+            >
+              {isFollowing ? "Unfollow" : "Follow"}
             </Button>
           )}
         </Group>
@@ -95,7 +118,7 @@ const Profile = () => {
           <Group gap={4}>
             <IconCalendar size={14} />
             <Text size="sm" c="dimmed">
-              Joined January 2023
+              Joined {dateJoined}
             </Text>
           </Group>
         </Group>
