@@ -3,4 +3,6 @@ export interface IProfile {
   username: string;
   full_name: string;
   bio: string;
+  created_at: string;
+  is_following: boolean;
 }
