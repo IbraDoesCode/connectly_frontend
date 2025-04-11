@@ -1,5 +1,5 @@
 import { notifications } from "@mantine/notifications";
-import { followUserApi } from "./../api/profiles";
+import { FollowAPIResponse, followUserApi } from "./../api/profiles";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useFollow = () => {
@@ -7,11 +7,13 @@ export const useFollow = () => {
 
   const followMutation = useMutation({
     mutationFn: followUserApi,
-    onSuccess: () => {
-      queryClient.removeQueries({ queryKey: ["suggested-profiles"] });
+    onSuccess: (data: FollowAPIResponse) => {
+      queryClient.invalidateQueries({ queryKey: ["suggested-profiles"] });
+
       notifications.show({
-        message: "User Followed!",
-        position: "top-right",
+        title: "Success",
+        message: data.is_following ? "User Followed!" : "User Unfollowed!",
+        position: "bottom-right",
         color: "green",
       });
     },
