@@ -27,3 +27,14 @@ export const deletePostApi = async (postId: number) => {
 
   return res.data;
 };
+
+export const getProfilePostsApi = async (
+  userId: number,
+  pageParam: number | unknown
+) => {
+  const res = await apiClient.get(`/profiles/${userId}/posts/`, {
+    params: { page: pageParam },
+  });
+
+  return res.data;
+};
