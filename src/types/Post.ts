@@ -9,6 +9,7 @@ export interface IPost {
   content: string;
   post_type: "text" | "image" | "video";
   media?: { url: string }[];
+  privacy_type: "public" | "followers" | "private";
   created_at: string;
   is_liked: boolean;
   like_count: number;
