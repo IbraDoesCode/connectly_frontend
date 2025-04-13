@@ -155,24 +155,36 @@ const Post = ({ post }: PostProps) => {
               </video>
             )}
 
-            {/* Post Actions */}
             <Divider my="sm" />
-            <Group gap="md">
-              <ActionIcon
-                variant="transparent"
-                size="xs"
-                loading={isPending}
-                onClick={() => like(post.id)}
-              >
-                {isLiked ? (
-                  <IconHeart size={18} color="red" fill="red" />
-                ) : (
-                  <IconHeart size={18} color="gray" />
-                )}
-              </ActionIcon>
-              <ActionIcon variant="transparent" size="xs" onClick={open}>
-                <IconMessageCircle size={16} color="gray" />
-              </ActionIcon>
+
+            {/* Like & Comment */}
+            <Group gap="sm">
+              <Group gap="xs">
+                <Text size="sm" c="dimmed">
+                  {post.like_count}
+                </Text>
+                <ActionIcon
+                  variant="transparent"
+                  size="xs"
+                  loading={isPending}
+                  onClick={() => like(post.id)}
+                >
+                  {isLiked ? (
+                    <IconHeart size={16} color="red" fill="red" />
+                  ) : (
+                    <IconHeart size={16} color="gray" />
+                  )}
+                </ActionIcon>
+              </Group>
+
+              <Group gap="xs">
+                <Text size="sm" c="dimmed">
+                  {post.comment_count}
+                </Text>
+                <ActionIcon variant="transparent" size="xs" onClick={open}>
+                  <IconMessageCircle size={16} color="gray" />
+                </ActionIcon>
+              </Group>
             </Group>
           </div>
         </Group>
