@@ -1,1 +1,1 @@
-export type FeedType = "public" | "following";
+export type FeedType = "public" | "following" | "posts";
