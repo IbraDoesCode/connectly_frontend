@@ -18,6 +18,9 @@ import {
   IconMessageCircle,
   IconHeart,
   IconDotsVertical,
+  IconWorld,
+  IconUsers,
+  IconLock,
 } from "@tabler/icons-react";
 import { Link } from "react-router-dom";
 import { IPost } from "../types/Post";
@@ -80,6 +83,19 @@ const Post = ({ post }: PostProps) => {
     });
   };
 
+  const renderPrivacyIcon = (type: string) => {
+    switch (type) {
+      case "public":
+        return <IconWorld size={13} color="gray" />;
+      case "followers":
+        return <IconUsers size={13} color="gray" />;
+      case "private":
+        return <IconLock size={13} color="gray" />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <>
       <Card className="border border-gray-700 rounded-md p-4">
@@ -91,11 +107,9 @@ const Post = ({ post }: PostProps) => {
 
           <div className="flex flex-col flex-1">
             <Group align="start" gap="xs">
+              <Text size="sm">{post.author.full_name}</Text>
               <Text size="sm" c="dimmed">
-                {post.author.username}
-              </Text>
-              <Text size="sm" c="dimmed">
-                {format(post.created_at)}
+                @{post.author.username}
               </Text>
               {isAuthor && (
                 <Menu position="bottom-end">
@@ -115,6 +129,12 @@ const Post = ({ post }: PostProps) => {
                   </MenuDropdown>
                 </Menu>
               )}
+            </Group>
+            <Group gap="xs">
+              <Text size="xs" c="dimmed">
+                {format(post.created_at)}
+              </Text>
+              {renderPrivacyIcon(post.privacy_type)}
             </Group>
 
             {/* Post Content */}
