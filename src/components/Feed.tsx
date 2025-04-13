@@ -5,13 +5,14 @@ import { FeedType } from "../types/Types";
 import { useEffect } from "react";
 import { useIntersection } from "@mantine/hooks";
 import { IFeed } from "../types/Post";
-import { fetchFeedApi } from "../api/post";
+import { fetchFeedApi, getProfilePostsApi } from "../api/post";
 
 interface FeedProps {
   feedType: FeedType;
+  userId?: number;
 }
 
-const Feed = ({ feedType }: FeedProps) => {
+const Feed = ({ feedType, userId }: FeedProps) => {
   const {
     data,
     error,
@@ -20,8 +21,13 @@ const Feed = ({ feedType }: FeedProps) => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery<IFeed>({
-    queryKey: ["feed", feedType],
-    queryFn: ({ pageParam = 1 }) => fetchFeedApi(feedType, pageParam),
+    queryKey: ["feed", feedType, userId],
+    queryFn: ({ pageParam = 1 }) => {
+      if (feedType === "posts" && userId) {
+        return getProfilePostsApi(userId, pageParam);
+      }
+      return fetchFeedApi(feedType, pageParam);
+    },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       if (!lastPage.next) return undefined;
@@ -29,6 +35,7 @@ const Feed = ({ feedType }: FeedProps) => {
       const nextPage = url.searchParams.get("page");
       return nextPage ? parseInt(nextPage) : undefined;
     },
+    enabled: feedType !== "posts" || !!userId,
   });
 
   const { ref: sentinelRef, entry } = useIntersection({
