@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getProfileApi } from "../api/profiles";
 import { useFollow } from "../hooks/useFollow";
 import { useEffect, useState } from "react";
+import Feed from "../components/Feed";
 
 const Profile = () => {
   const { userId } = useParams();
@@ -43,7 +44,7 @@ const Profile = () => {
           <Stack gap={0}>
             <Title order={3}>{profile?.username}</Title>
             <Text size="sm" c="dimmed">
-              100 posts
+              {profile?.posts_count} posts
             </Text>
           </Stack>
         </Group>
@@ -107,32 +108,23 @@ const Profile = () => {
         {/* Bio */}
         <Text mt="md"> {profile?.bio} </Text>
 
-        {/* Link and date joined */}
-        <Group gap="xs" mt="md">
-          {/* <Group gap={4}>
-            <IconLink size={14} />
-            <Text component="a" href="" target="_blank" size="sm" c="blue">
-              www.google.com
-            </Text>
-          </Group> */}
-          <Group gap={4}>
-            <IconCalendar size={14} />
-            <Text size="sm" c="dimmed">
-              Joined {dateJoined}
-            </Text>
-          </Group>
+        {/* Date Joined */}
+        <Group gap={4} mt="md">
+          <IconCalendar size={14} />
+          <Text size="sm" c="dimmed">
+            Joined {dateJoined}
+          </Text>
         </Group>
 
         {/* Followers and Following */}
         <Group gap="md" mt="md">
-          <Text size="sm">
-            <b>0</b> Following
-          </Text>
-          <Text size="sm">
-            <b>0</b> Followers
-          </Text>
+          <Text size="sm">{profile.following} Following</Text>
+          <Text size="sm">{profile.followers} Followers</Text>
         </Group>
       </Card>
+
+      {/* User posts */}
+      <Feed feedType="posts" userId={profile.id} />
     </>
   );
 };
