@@ -5,6 +5,7 @@ import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import PostDetail from "./pages/PostDetail";
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -19,6 +20,7 @@ const App = () => {
           <Route path="/home" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="profile/:userId" element={<Profile />} />
+            <Route path="post/:postId" element={<PostDetail />} />
           </Route>
         </Routes>
       </Router>
