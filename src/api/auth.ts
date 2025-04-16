@@ -6,7 +6,7 @@ export const getAuthenticatedUserApi = async () => {
   return res.data;
 };
 
-export const loginApi = async (loginData: LoginData) => {
+export const login = async (loginData: LoginData) => {
   const res = await client.post("/token/", loginData);
 
   localStorage.setItem("access", res.data.access);
@@ -15,7 +15,7 @@ export const loginApi = async (loginData: LoginData) => {
   return res.data;
 };
 
-export const signupApi = async (signupData: SignupData) => {
+export const signup = async (signupData: SignupData) => {
   const res = await client.post("/users/register/", signupData);
 
   localStorage.setItem("access", res.data.access);
@@ -24,7 +24,7 @@ export const signupApi = async (signupData: SignupData) => {
   return res.data;
 };
 
-export const logoutApi = async () => {
+export const logout = async () => {
   const res = await client.post("/logout/", {
     refresh: localStorage.getItem("refresh"),
   });
