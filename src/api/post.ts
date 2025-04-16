@@ -1,12 +1,14 @@
-import apiClient from "./apiClient";
-import { FeedType } from "../types/Types";
-import { IFeed } from "../types/Post";
+import { Post } from "../types/APITypes";
+import { Comments } from "../types/common";
+import client from "./client";
+import { FeedType } from "../types/common";
+import { Feed } from "../types/common";
 
-export const fetchFeedApi = async (
+export const fetchFeed = async (
   feedType: FeedType,
   pageParam: number | unknown
 ) => {
-  const res = await apiClient.get<IFeed>("/profiles/feed/", {
+  const res = await client.get<Feed>("/profiles/feed/", {
     params: {
       feed_type: feedType,
       page: pageParam,
@@ -16,24 +18,43 @@ export const fetchFeedApi = async (
   return res.data;
 };
 
-export const likePostApi = async (postId: number) => {
-  const res = await apiClient.post(`/posts/${postId}/like`);
+export const fetchPostById = async (postId: string) => {
+  const res = await client.get<Post>(`/posts/${postId}/`);
 
   return res.data;
 };
 
-export const deletePostApi = async (postId: number) => {
-  const res = await apiClient.delete(`/posts/${postId}/`);
+export const likePost = async (postId: number) => {
+  const res = await client.post(`/posts/${postId}/like`);
 
   return res.data;
 };
 
-export const getProfilePostsApi = async (
+export const deletePost = async (postId: number) => {
+  const res = await client.delete(`/posts/${postId}/`);
+
+  return res.data;
+};
+
+export const fetchPostsByUserId = async (
   userId: number,
   pageParam: number | unknown
 ) => {
-  const res = await apiClient.get(`/profiles/${userId}/posts/`, {
+  const res = await client.get(`/profiles/${userId}/posts/`, {
     params: { page: pageParam },
+  });
+
+  return res.data;
+};
+
+export const fetchCommentsByPostId = async (
+  postId: string,
+  pageParam: number | unknown
+) => {
+  const res = await client.get<Comments>(`/posts/${postId}/comments`, {
+    params: {
+      page: pageParam,
+    },
   });
 
   return res.data;
