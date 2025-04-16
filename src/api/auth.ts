@@ -1,15 +1,14 @@
-import { LoginData, SignupData } from "../types/Auth";
-import apiClient from "./apiClient";
+import { LoginData, SignupData } from "../types/AuthTypes";
+import client from "./client";
 
 export const getAuthenticatedUserApi = async () => {
-  const res = await apiClient.get("/profiles/me/");
+  const res = await client.get("/profiles/me/");
   return res.data;
 };
 
 export const loginApi = async (loginData: LoginData) => {
-  const res = await apiClient.post("/token/", loginData);
+  const res = await client.post("/token/", loginData);
 
-  console.log("Auth login response:", res);
   localStorage.setItem("access", res.data.access);
   localStorage.setItem("refresh", res.data.refresh);
 
@@ -17,9 +16,8 @@ export const loginApi = async (loginData: LoginData) => {
 };
 
 export const signupApi = async (signupData: SignupData) => {
-  const res = await apiClient.post("/users/register/", signupData);
+  const res = await client.post("/users/register/", signupData);
 
-  console.log("Auth signup response:", res);
   localStorage.setItem("access", res.data.access);
   localStorage.setItem("refresh", res.data.refresh);
 
@@ -27,11 +25,10 @@ export const signupApi = async (signupData: SignupData) => {
 };
 
 export const logoutApi = async () => {
-  const res = await apiClient.post("/logout/", {
+  const res = await client.post("/logout/", {
     refresh: localStorage.getItem("refresh"),
   });
 
-  console.log("Auth logout response:", res);
   localStorage.removeItem("access");
   localStorage.removeItem("refresh");
 
