@@ -2,7 +2,7 @@ import { Avatar, Button, Card, Group, Stack, Text, Title } from "@mantine/core";
 import { IconArrowLeft, IconCalendar, IconEdit } from "@tabler/icons-react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { getProfileApi } from "../api/profiles";
+import { fetchProfileById } from "../api/profiles";
 import { useFollow } from "../hooks/useFollow";
 import { useEffect, useState } from "react";
 import Feed from "../components/Feed";
@@ -16,7 +16,7 @@ const Profile = () => {
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile", userId],
-    queryFn: () => getProfileApi(userId!),
+    queryFn: () => fetchProfileById(userId!),
     enabled: !!userId,
   });
 
