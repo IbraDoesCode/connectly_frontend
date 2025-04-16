@@ -1,24 +1,20 @@
-import { IProfile } from "../types/Profile";
-import apiClient from "./apiClient";
-
-export interface FollowAPIResponse {
-  is_following: boolean;
-}
+import { FollowStatusResponse, Profile } from "../types/APITypes";
+import client from "./client";
 
 export const getSuggestedProfilesApi = async () => {
-  const res = await apiClient.get<IProfile[]>("/profiles/suggestions/");
+  const res = await client.get<Profile[]>("/profiles/suggestions/");
 
   return res.data;
 };
 
-export const getProfileApi = async (userId: string) => {
-  const res = await apiClient.get<IProfile>(`/profiles/${userId}/`);
+export const fetchProfileById = async (userId: string) => {
+  const res = await client.get<Profile>(`/profiles/${userId}/`);
 
   return res.data;
 };
 
-export const followUserApi = async (userId: number) => {
-  const res = await apiClient.post<FollowAPIResponse>(
+export const followUser = async (userId: number) => {
+  const res = await client.post<FollowStatusResponse>(
     `profiles/${userId}/follow/`
   );
 
