@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const apiClient = axios.create({
+const client = axios.create({
   baseURL: "https://127.0.0.1:8000",
 });
 
 // Request interceptor to inject token
-apiClient.interceptors.request.use(
+client.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("access");
     if (token) {
@@ -19,7 +19,7 @@ apiClient.interceptors.request.use(
 );
 
 // Add interceptor to refresh token
-apiClient.interceptors.response.use(
+client.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
@@ -28,7 +28,7 @@ apiClient.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem("refresh");
-        const res = await apiClient.post("/token/refresh/", {
+        const res = await client.post("/token/refresh/", {
           refresh: refreshToken,
         });
 
@@ -36,8 +36,8 @@ apiClient.interceptors.response.use(
         localStorage.setItem("access", access);
         localStorage.setItem("refresh", newRefresh);
 
-        apiClient.defaults.headers.common["Authorization"] = `Bearer ${access}`;
-        return apiClient(originalRequest);
+        client.defaults.headers.common["Authorization"] = `Bearer ${access}`;
+        return client(originalRequest);
       } catch (error) {
         console.error("Token refresh failed:", error);
         localStorage.removeItem("access");
@@ -50,4 +50,4 @@ apiClient.interceptors.response.use(
   }
 );
 
-export default apiClient;
+export default client;
