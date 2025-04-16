@@ -1,10 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  signupApi,
-  loginApi,
-  logoutApi,
-  getAuthenticatedUserApi,
-} from "../api/auth";
+import { signup, login, logout, getAuthenticatedUserApi } from "../api/auth";
 import { AxiosError } from "axios";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "react-router-dom";
@@ -14,7 +9,7 @@ export const useAuth = () => {
   const queryClient = useQueryClient();
 
   const loginMutation = useMutation({
-    mutationFn: loginApi,
+    mutationFn: login,
     onSuccess: () => {
       notifications.show({
         title: "Authentication",
@@ -34,7 +29,7 @@ export const useAuth = () => {
   });
 
   const signupMutation = useMutation({
-    mutationFn: signupApi,
+    mutationFn: signup,
     onSuccess: () => {
       notifications.show({
         title: "Authentication",
@@ -45,7 +40,12 @@ export const useAuth = () => {
 
       navigate("/home");
     },
-    onError: (error: AxiosError<{ username?: string[]; email?: string[] }>) => {
+    onError: (
+      error: AxiosError<{
+        username?: string[];
+        email?: string[];
+      }>
+    ) => {
       let errorMessage = "Something went wrong. Please try again.";
 
       if (error.response?.data.username) {
@@ -64,7 +64,7 @@ export const useAuth = () => {
   });
 
   const logoutMutation = useMutation({
-    mutationFn: logoutApi,
+    mutationFn: logout,
     onSuccess: () => {
       notifications.show({
         title: "Authentication",
