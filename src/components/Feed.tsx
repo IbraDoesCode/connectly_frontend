@@ -49,7 +49,7 @@ const Feed = ({ feedType, userId }: FeedProps) => {
   }, [entry, hasNextPage, fetchNextPage, isFetchingNextPage]);
 
   // Flatten all pages into a single array of posts
-  const allPosts = data?.pages.flatMap((page) => page.results) || [];
+  const posts = data?.pages.flatMap((page) => page.results) || [];
 
   if (error) {
     return (
@@ -68,23 +68,19 @@ const Feed = ({ feedType, userId }: FeedProps) => {
       )}
 
       <Stack mt="md">
-        {allPosts.length > 0 ? (
+        {posts.length > 0 ? (
           <>
-            {allPosts.map((post) => (
+            {posts.map((post) => (
               <Post key={post.id} post={post} />
             ))}
 
             {/* Scroll detection element */}
             <div ref={sentinelRef} style={{ height: 1 }} />
 
-            {isFetchingNextPage && (
-              <Center py="xl">
-                <Loader size="sm" />
-              </Center>
-            )}
+            {isFetchingNextPage && <Loader ta="center" size="sm" />}
 
-            {!hasNextPage && allPosts.length > 0 && (
-              <Text c="dimmed" ta="center" py="md">
+            {!hasNextPage && posts.length > 0 && (
+              <Text c="dimmed" ta="center">
                 No more posts to show 🥲
               </Text>
             )}
