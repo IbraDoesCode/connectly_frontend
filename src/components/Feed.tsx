@@ -1,11 +1,11 @@
 import { Center, Loader, Stack, Text } from "@mantine/core";
 import Post from "./Post";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { FeedType } from "../types/Types";
+import { FeedType } from "../types/common";
 import { useEffect } from "react";
 import { useIntersection } from "@mantine/hooks";
-import { IFeed } from "../types/Post";
-import { fetchFeedApi, getProfilePostsApi } from "../api/post";
+import { Feed as IFeed } from "../types/common";
+import { fetchFeed, fetchPostsByUserId } from "../api/post";
 
 interface FeedProps {
   feedType: FeedType;
@@ -24,9 +24,9 @@ const Feed = ({ feedType, userId }: FeedProps) => {
     queryKey: ["feed", feedType, userId],
     queryFn: ({ pageParam = 1 }) => {
       if (feedType === "posts" && userId) {
-        return getProfilePostsApi(userId, pageParam);
+        return fetchPostsByUserId(userId, pageParam);
       }
-      return fetchFeedApi(feedType, pageParam);
+      return fetchFeed(feedType, pageParam);
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
@@ -60,7 +60,7 @@ const Feed = ({ feedType, userId }: FeedProps) => {
   }
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative">
       {isLoading && (
         <Center className="absolute inset-0 z-10">
           <Loader size="xl" type="dots" />
