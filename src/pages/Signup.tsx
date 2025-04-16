@@ -45,7 +45,9 @@ const Signup = () => {
 
   const { signup, isSigningUp } = useAuth();
 
-  const handleSubmit = () => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
     const nameParts = form.values.fullname.trim().split(/\s+/);
     const first_name = nameParts[0];
     const last_name = nameParts.slice(1).join(" ");
