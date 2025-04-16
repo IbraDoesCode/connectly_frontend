@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { IconPhotoPlus, IconUsers, IconWorld } from "@tabler/icons-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import apiClient from "../api/apiClient";
+import client from "../api/client";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 
@@ -28,7 +28,7 @@ const NewPost = () => {
   const { mutate: post, isPending } = useMutation({
     mutationFn: async (formData: FormData) => {
       console.log(formData);
-      const res = await apiClient.post("/posts/", formData, {
+      const res = await client.post("/posts/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       return res.data;
@@ -78,7 +78,7 @@ const NewPost = () => {
     <Card className="border border-gray-700 rounded-md p-4" mt="md">
       <Group align="start" gap="sm">
         {/* Avatar */}
-        <Avatar radius="xl" src="/avatar-placeholder.png" />
+        <Avatar radius="xl" />
         <div className="flex flex-col flex-1">
           {/* Text Input */}
           <Textarea
