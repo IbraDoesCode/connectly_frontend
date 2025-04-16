@@ -18,6 +18,13 @@ export const fetchFeed = async (
   return res.data;
 };
 
+export const createPost = async (formData: FormData) => {
+  const res = await client.post("/posts/", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return res.data;
+};
+
 export const fetchPostById = async (postId: string) => {
   const res = await client.get<Post>(`/posts/${postId}/`);
 
