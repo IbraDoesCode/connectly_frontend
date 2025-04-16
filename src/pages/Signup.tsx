@@ -134,7 +134,7 @@ const Signup = () => {
               component="button"
               type="button"
               c="dimmed"
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/")}
               size="xs"
             >
               Already have an account? Login
