@@ -12,9 +12,9 @@ import {
 } from "@mantine/core";
 import { IconPhotoPlus, IconUsers, IconWorld } from "@tabler/icons-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import client from "../api/client";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
+import { createPost } from "../api/post";
 
 const NewPost = () => {
   const [text, setText] = useState("");
@@ -26,13 +26,7 @@ const NewPost = () => {
   const queryClient = useQueryClient();
 
   const { mutate: post, isPending } = useMutation({
-    mutationFn: async (formData: FormData) => {
-      console.log(formData);
-      const res = await client.post("/posts/", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      return res.data;
-    },
+    mutationFn: createPost,
     onSuccess: () => {
       setText("");
       setImage(null);
