@@ -9,11 +9,9 @@ import {
   MenuDropdown,
   MenuItem,
   MenuTarget,
-  Modal,
   Text,
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import { useDisclosure } from "@mantine/hooks";
 import {
   IconMessageCircle,
   IconHeart,
@@ -22,23 +20,23 @@ import {
   IconUsers,
   IconLock,
 } from "@tabler/icons-react";
-import { Link } from "react-router-dom";
-import { IPost } from "../types/Post";
+import { Link, useNavigate } from "react-router-dom";
+import { Post as PostType } from "../types/APITypes";
 import { format } from "timeago.js";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deletePostApi, likePostApi } from "../api/post";
+import { deletePost, likePost } from "../api/post";
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { notifications } from "@mantine/notifications";
 
 interface PostProps {
-  post: IPost;
+  post: PostType;
 }
 
 const Post = ({ post }: PostProps) => {
-  const [opened, { open, close }] = useDisclosure(false);
   const [isLiked, setIsLiked] = useState(post.is_liked);
   const { authenticatedUser } = useAuth();
+  const navigate = useNavigate();
 
   const isAuthor = post.author.id === authenticatedUser?.id;
 
@@ -49,15 +47,15 @@ const Post = ({ post }: PostProps) => {
 
   const queryClient = useQueryClient();
   const { mutate: like, isPending } = useMutation({
-    mutationFn: likePostApi,
+    mutationFn: likePost,
     onSuccess: () => {
       setIsLiked((prev) => !prev);
       queryClient.invalidateQueries({ queryKey: ["feed"] });
     },
   });
 
-  const { mutate: deletePost } = useMutation({
-    mutationFn: deletePostApi,
+  const { mutate } = useMutation({
+    mutationFn: deletePost,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["feed"] });
       notifications.show({
@@ -79,7 +77,7 @@ const Post = ({ post }: PostProps) => {
       ),
       labels: { confirm: "Delete", cancel: "Cancel" },
       confirmProps: { color: "red" },
-      onConfirm: () => deletePost(postId),
+      onConfirm: () => mutate(postId),
     });
   };
 
@@ -98,11 +96,11 @@ const Post = ({ post }: PostProps) => {
 
   return (
     <>
-      <Card className="border border-gray-700 rounded-md p-4">
+      <Card radius="md" withBorder p="md">
         <Group align="start" gap="xs">
           {/* Avatar */}
           <Link to={`/home/profile/${post.author.id}`}>
-            <Avatar src={post.author.avatar_url} radius="xl" />
+            <Avatar radius="xl" />
           </Link>
 
           <div className="flex flex-col flex-1">
@@ -181,7 +179,11 @@ const Post = ({ post }: PostProps) => {
                 <Text size="sm" c="dimmed">
                   {post.comment_count}
                 </Text>
-                <ActionIcon variant="transparent" size="xs" onClick={open}>
+                <ActionIcon
+                  variant="transparent"
+                  size="xs"
+                  onClick={() => navigate(`/home/post/${post.id}`)}
+                >
                   <IconMessageCircle size={16} color="gray" />
                 </ActionIcon>
               </Group>
@@ -189,11 +191,6 @@ const Post = ({ post }: PostProps) => {
           </div>
         </Group>
       </Card>
-
-      {/* Comment Modal */}
-      <Modal opened={opened} onClose={close} title="Comments">
-        <Text>No comments yet 🤔 Be the first one 😉</Text>
-      </Modal>
     </>
   );
 };
