@@ -50,3 +50,7 @@ export interface PaginatedResponse<T> {
 export interface FollowStatusResponse {
   is_following: boolean;
 }
+
+export interface LikeStatusResponse {
+  liked: boolean;
+}
