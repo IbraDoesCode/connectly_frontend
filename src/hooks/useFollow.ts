@@ -1,14 +1,13 @@
 import { notifications } from "@mantine/notifications";
 import { followUser } from "./../api/profiles";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { FollowStatusResponse } from "../types/APITypes";
 
 export const useFollow = () => {
   const queryClient = useQueryClient();
 
   const followMutation = useMutation({
     mutationFn: followUser,
-    onSuccess: (data: FollowStatusResponse) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["suggested-profiles"] });
 
       notifications.show({
