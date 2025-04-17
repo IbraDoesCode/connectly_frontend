@@ -51,6 +51,7 @@ const Post = ({ post }: PostProps) => {
     onSuccess: () => {
       setIsLiked((prev) => !prev);
       queryClient.invalidateQueries({ queryKey: ["feed"] });
+      queryClient.invalidateQueries({ queryKey: ["post", post.id] });
     },
   });
 
