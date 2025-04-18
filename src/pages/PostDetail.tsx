@@ -20,29 +20,22 @@ import {
   Card,
   Center,
   Divider,
+  Flex,
   Group,
   Loader,
-  Menu,
-  MenuDropdown,
-  MenuItem,
-  MenuTarget,
   Stack,
   Text,
   Textarea,
   Title,
 } from "@mantine/core";
-import {
-  IconArrowLeft,
-  IconCaretDownFilled,
-  IconDotsVertical,
-  IconHeart,
-} from "@tabler/icons-react";
+import { IconArrowLeft, IconCaretDownFilled } from "@tabler/icons-react";
 import Post from "../components/Post";
 import { useState } from "react";
-import { format } from "timeago.js";
 import { useAuth } from "../hooks/useAuth";
 import { notifications } from "@mantine/notifications";
 import { modals } from "@mantine/modals";
+import PostHeader from "../components/PostHeader";
+import LikeButton from "../components/LikeButton";
 
 const PostDetail = () => {
   const { postId } = useParams();
@@ -229,76 +222,33 @@ const PostDetail = () => {
 
         {/* Fetched comments */}
         {comments.map((comment) => (
-          <Card
-            radius="md"
-            withBorder
-            p="md"
-            variant="unstyled"
-            key={comment.id}
-          >
+          <Card radius="md" withBorder p="md" key={comment.id}>
             <Group align="start" gap="xs">
               {/* Avatar */}
               <Link to={`/home/profile/${comment.author.id}`}>
                 <Avatar radius="xl" />
               </Link>
 
-              <div className="flex flex-col flex-1">
-                <Group align="start" gap="xs">
-                  <Text size="sm">{comment.author.full_name}</Text>
-                  <Text size="sm" c="dimmed">
-                    @{comment.author.username}
-                  </Text>
-                  {comment.author.id === authenticatedUser.id && (
-                    <Menu position="bottom-end">
-                      <MenuTarget>
-                        <ActionIcon variant="transparent" className="ml-auto">
-                          <IconDotsVertical size={16} />
-                        </ActionIcon>
-                      </MenuTarget>
-
-                      <MenuDropdown>
-                        <MenuItem
-                          color="red"
-                          onClick={() => handleDelete(comment.id)}
-                        >
-                          Delete
-                        </MenuItem>
-                      </MenuDropdown>
-                    </Menu>
-                  )}
-                </Group>
-                <Group gap="xs">
-                  <Text size="xs" c="dimmed">
-                    {format(comment.created_at)}
-                  </Text>
-                </Group>
+              <Flex direction="column" className="flex-1">
+                <PostHeader
+                  author={comment.author}
+                  isAuthor={authenticatedUser.id === comment.author.id}
+                  onDelete={() => handleDelete(comment.id)}
+                  createdAt={comment.created_at}
+                />
 
                 {/* Comment Content */}
                 <Text mt="sm">{comment.content}</Text>
 
                 <Divider my="sm" />
 
-                {/* Like count and Like button*/}
-                <Group gap="sm">
-                  <Group gap="xs">
-                    <Text size="sm" c="dimmed">
-                      {comment.like_count}
-                    </Text>
-                    <ActionIcon
-                      variant="transparent"
-                      size="xs"
-                      onClick={() => handleLike(comment.id)}
-                      disabled={isLiking}
-                    >
-                      {comment.is_liked ? (
-                        <IconHeart size={16} color="red" fill="red" />
-                      ) : (
-                        <IconHeart size={16} color="gray" />
-                      )}
-                    </ActionIcon>
-                  </Group>
-                </Group>
-              </div>
+                <LikeButton
+                  likeCount={comment.like_count}
+                  onClick={() => handleLike(comment.id)}
+                  isLiked={comment.is_liked}
+                  disabled={isLiking}
+                />
+              </Flex>
             </Group>
           </Card>
         ))}
