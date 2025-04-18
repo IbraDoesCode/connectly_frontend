@@ -10,7 +10,7 @@ export interface Profile {
   following: number;
 }
 
-interface Author {
+export interface Author {
   id: string;
   username: string;
   full_name: string;
