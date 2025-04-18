@@ -3,31 +3,22 @@ import {
   Avatar,
   Card,
   Divider,
+  Flex,
   Group,
   Image,
-  Menu,
-  MenuDropdown,
-  MenuItem,
-  MenuTarget,
   Text,
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import {
-  IconMessageCircle,
-  IconHeart,
-  IconDotsVertical,
-  IconWorld,
-  IconUsers,
-  IconLock,
-} from "@tabler/icons-react";
+import { IconMessageCircle } from "@tabler/icons-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Post as PostType } from "../types/APITypes";
-import { format } from "timeago.js";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deletePost, likePost } from "../api/post";
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { notifications } from "@mantine/notifications";
+import PostHeader from "./PostHeader";
+import LikeButton from "./LikeButton";
 
 interface PostProps {
   post: PostType;
@@ -46,7 +37,7 @@ const Post = ({ post }: PostProps) => {
   const isVideo = firstMedia && /\.(mp4|mov|webm)$/i.test(firstMedia);
 
   const queryClient = useQueryClient();
-  const { mutate: like, isPending } = useMutation({
+  const { mutate: like, isPending: isLiking } = useMutation({
     mutationFn: likePost,
     onSuccess: () => {
       setIsLiked((prev) => !prev);
@@ -82,19 +73,6 @@ const Post = ({ post }: PostProps) => {
     });
   };
 
-  const renderPrivacyIcon = (type: string) => {
-    switch (type) {
-      case "public":
-        return <IconWorld size={13} color="gray" />;
-      case "followers":
-        return <IconUsers size={13} color="gray" />;
-      case "private":
-        return <IconLock size={13} color="gray" />;
-      default:
-        return null;
-    }
-  };
-
   return (
     <>
       <Card radius="md" withBorder p="md">
@@ -104,37 +82,14 @@ const Post = ({ post }: PostProps) => {
             <Avatar radius="xl" />
           </Link>
 
-          <div className="flex flex-col flex-1">
-            <Group align="start" gap="xs">
-              <Text size="sm">{post.author.full_name}</Text>
-              <Text size="sm" c="dimmed">
-                @{post.author.username}
-              </Text>
-              {isAuthor && (
-                <Menu position="bottom-end">
-                  <MenuTarget>
-                    <ActionIcon variant="transparent" className="ml-auto">
-                      <IconDotsVertical size={16} />
-                    </ActionIcon>
-                  </MenuTarget>
-
-                  <MenuDropdown>
-                    <MenuItem onClick={() => console.log("Edit", post.id)}>
-                      Edit Post
-                    </MenuItem>
-                    <MenuItem color="red" onClick={() => handleDelete(post.id)}>
-                      Delete Post
-                    </MenuItem>
-                  </MenuDropdown>
-                </Menu>
-              )}
-            </Group>
-            <Group gap="xs">
-              <Text size="xs" c="dimmed">
-                {format(post.created_at)}
-              </Text>
-              {renderPrivacyIcon(post.privacy_type)}
-            </Group>
+          <Flex direction="column" className="flex-1">
+            <PostHeader
+              author={post.author}
+              isAuthor={isAuthor}
+              onDelete={() => handleDelete(post.id)}
+              createdAt={post.created_at}
+              privacyType={post.privacy_type}
+            />
 
             {/* Post Content */}
             <Text mt="sm">{post.content}</Text>
@@ -143,7 +98,10 @@ const Post = ({ post }: PostProps) => {
               <Image
                 src={firstMedia}
                 alt="Post media"
-                className="rounded-md border border-gray-700 mt-2 max-h-80 object-contain"
+                fit="contain"
+                radius="md"
+                w="auto"
+                mt="xs"
               />
             )}
 
@@ -158,23 +116,12 @@ const Post = ({ post }: PostProps) => {
 
             {/* Like & Comment */}
             <Group gap="sm">
-              <Group gap="xs">
-                <Text size="sm" c="dimmed">
-                  {post.like_count}
-                </Text>
-                <ActionIcon
-                  variant="transparent"
-                  size="xs"
-                  loading={isPending}
-                  onClick={() => like(post.id)}
-                >
-                  {isLiked ? (
-                    <IconHeart size={16} color="red" fill="red" />
-                  ) : (
-                    <IconHeart size={16} color="gray" />
-                  )}
-                </ActionIcon>
-              </Group>
+              <LikeButton
+                likeCount={post.like_count}
+                onClick={() => like(post.id)}
+                isLiked={isLiked}
+                disabled={isLiking}
+              />
 
               <Group gap="xs">
                 <Text size="sm" c="dimmed">
@@ -189,7 +136,7 @@ const Post = ({ post }: PostProps) => {
                 </ActionIcon>
               </Group>
             </Group>
-          </div>
+          </Flex>
         </Group>
       </Card>
     </>
