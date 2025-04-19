@@ -9,6 +9,8 @@ export const useFollow = () => {
     mutationFn: followUser,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["suggested-profiles"] });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["feed"] });
 
       notifications.show({
         title: "Success",
