@@ -2,7 +2,7 @@ import { Avatar, Button, Card } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { getSuggestedProfilesApi } from "../api/profiles";
-import { IProfile } from "../types/Profile";
+import { Profile } from "../types/APITypes";
 import { useFollow } from "../hooks/useFollow";
 
 const RightPanel = () => {
@@ -20,7 +20,7 @@ const RightPanel = () => {
       <Card className="rounded-md">
         <p className="font-bold">Who to follow</p>
         <div className="flex flex-col gap-4">
-          {data?.map((profile: IProfile) => (
+          {data?.map((profile: Profile) => (
             <div
               key={profile.id}
               className="flex items-center justify-between gap-4"
