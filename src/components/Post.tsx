@@ -67,72 +67,70 @@ const Post = ({ post }: PostProps) => {
   };
 
   return (
-    <>
-      <Card radius="md" withBorder p="md">
-        <Group align="start" gap="xs">
-          {/* Avatar */}
-          <Link to={`/home/profile/${post.author.id}`}>
-            <Avatar radius="xl" />
-          </Link>
+    <Card radius="md" withBorder p="md">
+      <Group align="start" gap="xs">
+        {/* Avatar */}
+        <Link to={`/home/profile/${post.author.id}`}>
+          <Avatar radius="xl" />
+        </Link>
 
-          <Flex direction="column" className="flex-1">
-            <PostHeader
-              author={post.author}
-              isAuthor={isAuthor}
-              onDelete={() => handleDelete(post.id)}
-              createdAt={post.created_at}
-              privacyType={post.privacy_type}
+        <Flex direction="column" className="flex-1">
+          <PostHeader
+            author={post.author}
+            isAuthor={isAuthor}
+            onDelete={() => handleDelete(post.id)}
+            createdAt={post.created_at}
+            privacyType={post.privacy_type}
+          />
+
+          {/* Post Content */}
+          <Text mt="sm">{post.content}</Text>
+
+          {isImage && (
+            <Image
+              src={firstMedia}
+              alt="Post media"
+              fit="contain"
+              radius="md"
+              w="auto"
+              mt="xs"
+            />
+          )}
+
+          {isVideo && (
+            <video controls className="rounded-md mt-2 w-full">
+              <source src={firstMedia} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          )}
+
+          <Divider my="sm" />
+
+          {/* Like & Comment */}
+          <Group gap="sm">
+            <LikeButton
+              likeCount={post.like_count}
+              onClick={() => like(post.id)}
+              isLiked={isLiked}
+              disabled={isLiking}
             />
 
-            {/* Post Content */}
-            <Text mt="sm">{post.content}</Text>
-
-            {isImage && (
-              <Image
-                src={firstMedia}
-                alt="Post media"
-                fit="contain"
-                radius="md"
-                w="auto"
-                mt="xs"
-              />
-            )}
-
-            {isVideo && (
-              <video controls className="rounded-md mt-2 w-full">
-                <source src={firstMedia} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            )}
-
-            <Divider my="sm" />
-
-            {/* Like & Comment */}
-            <Group gap="sm">
-              <LikeButton
-                likeCount={post.like_count}
-                onClick={() => like(post.id)}
-                isLiked={isLiked}
-                disabled={isLiking}
-              />
-
-              <Group gap="xs">
-                <Text size="sm" c="dimmed">
-                  {post.comment_count}
-                </Text>
-                <ActionIcon
-                  variant="transparent"
-                  size="xs"
-                  onClick={() => navigate(`/home/post/${post.id}`)}
-                >
-                  <IconMessageCircle size={16} color="gray" />
-                </ActionIcon>
-              </Group>
+            <Group gap="xs">
+              <Text size="sm" c="dimmed">
+                {post.comment_count}
+              </Text>
+              <ActionIcon
+                variant="transparent"
+                size="xs"
+                onClick={() => navigate(`/home/post/${post.id}`)}
+              >
+                <IconMessageCircle size={16} color="gray" />
+              </ActionIcon>
             </Group>
-          </Flex>
-        </Group>
-      </Card>
-    </>
+          </Group>
+        </Flex>
+      </Group>
+    </Card>
   );
 };
 
