@@ -8,7 +8,6 @@ import {
   Image,
   Text,
 } from "@mantine/core";
-import { modals } from "@mantine/modals";
 import { IconMessageCircle } from "@tabler/icons-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Post as PostType } from "../types/APITypes";
@@ -19,6 +18,7 @@ import { useAuth } from "../hooks/useAuth";
 import { notifications } from "@mantine/notifications";
 import PostHeader from "./PostHeader";
 import LikeButton from "./LikeButton";
+import confirmationModal from "./modals/confirmationModal";
 
 interface PostProps {
   post: PostType;
@@ -59,18 +59,11 @@ const Post = ({ post }: PostProps) => {
   });
 
   const handleDelete = (postId: number) => {
-    modals.openConfirmModal({
-      title: "Delete your post",
-      children: (
-        <Text>
-          Are you sure you want to delete this post? This action is
-          irreversible.
-        </Text>
-      ),
-      labels: { confirm: "Delete", cancel: "Cancel" },
-      confirmProps: { color: "red" },
-      onConfirm: () => mutate(postId),
-    });
+    confirmationModal(
+      "Delete your post",
+      "Are you sure you want to delete this post? This action is irreversible.",
+      () => mutate(postId)
+    );
   };
 
   return (

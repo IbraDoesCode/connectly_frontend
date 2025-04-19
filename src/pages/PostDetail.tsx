@@ -33,9 +33,9 @@ import Post from "../components/Post";
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { notifications } from "@mantine/notifications";
-import { modals } from "@mantine/modals";
 import PostHeader from "../components/PostHeader";
 import LikeButton from "../components/LikeButton";
+import confirmationModal from "../components/modals/confirmationModal";
 
 const PostDetail = () => {
   const { postId } = useParams();
@@ -148,18 +148,11 @@ const PostDetail = () => {
   };
 
   const handleDelete = (commentId: number) => {
-    modals.openConfirmModal({
-      title: "Delete your comment",
-      children: (
-        <Text>
-          Are you sure you want to delete this comment? This action is
-          irreversible.
-        </Text>
-      ),
-      labels: { confirm: "Delete", cancel: "Cancel" },
-      confirmProps: { color: "red" },
-      onConfirm: () => deleteCommentFn({ postId: post!.id, commentId }),
-    });
+    confirmationModal(
+      "Delete your comment",
+      "Are you sure you want to delete this comment? This action is irreversible.",
+      () => deleteCommentFn({ postId: post!.id, commentId })
+    );
   };
 
   const handleLike = (commentId: number) => {
