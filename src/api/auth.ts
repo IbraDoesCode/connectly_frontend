@@ -1,7 +1,7 @@
 import { LoginData, SignupData } from "../types/AuthTypes";
 import client from "./client";
 
-export const getAuthenticatedUserApi = async () => {
+export const getAuthUser = async () => {
   const res = await client.get("/profiles/me/");
   return res.data;
 };
