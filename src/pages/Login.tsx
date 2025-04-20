@@ -13,6 +13,7 @@ import { GoogleButton } from "../components/GoogleButton";
 import { useForm } from "@mantine/form";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { useEffect } from "react";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -31,7 +32,11 @@ const Login = () => {
     },
   });
 
-  const { login, isLoggingIn } = useAuth();
+  const { login, isLoggingIn, authenticatedUser } = useAuth();
+
+  useEffect(() => {
+    if (authenticatedUser) navigate("/home");
+  }, [authenticatedUser]);
 
   return (
     <div className="flex flex-col justify-center items-center h-screen">
