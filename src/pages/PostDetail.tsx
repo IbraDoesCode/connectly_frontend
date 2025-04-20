@@ -3,8 +3,6 @@ import {
   fetchPostById,
   fetchCommentsByPostId,
   createComment,
-  deleteComment,
-  likeComment,
 } from "../api/post";
 import {
   useInfiniteQuery,
@@ -15,12 +13,9 @@ import {
 import { Comments } from "../types/common";
 import {
   ActionIcon,
-  Avatar,
   Button,
-  Card,
   Center,
   Divider,
-  Flex,
   Group,
   Loader,
   Stack,
@@ -31,15 +26,12 @@ import {
 import { IconArrowLeft, IconCaretDownFilled } from "@tabler/icons-react";
 import Post from "../components/Post";
 import { useState } from "react";
-import { useAuth } from "../hooks/useAuth";
 import { notifications } from "@mantine/notifications";
-import PostHeader from "../components/PostHeader";
-import LikeButton from "../components/LikeButton";
-import confirmationModal from "../components/modals/confirmationModal";
+
+import Comment from "../components/Comment";
 
 const PostDetail = () => {
   const { postId } = useParams();
-  const { authenticatedUser } = useAuth();
   const queryClient = useQueryClient();
 
   const [comment, setComment] = useState("");
@@ -95,48 +87,6 @@ const PostDetail = () => {
     },
   });
 
-  const { mutate: deleteCommentFn } = useMutation({
-    mutationKey: ["comment"],
-    mutationFn: deleteComment,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["post", postId] });
-      queryClient.invalidateQueries({ queryKey: ["comments", postId] });
-      queryClient.invalidateQueries({ queryKey: ["feed"] });
-      notifications.show({
-        title: "Success",
-        message: "Comment deleted!",
-        color: "green",
-      });
-    },
-    onError: (error) => {
-      notifications.show({
-        title: "Error",
-        message: error.message,
-        color: "red",
-      });
-    },
-  });
-
-  const { mutate: like, isPending: isLiking } = useMutation({
-    mutationFn: likeComment,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["comments", postId] });
-
-      notifications.show({
-        title: "Success",
-        message: data.liked ? "Comment liked!" : "Comment unliked!",
-        color: "green",
-      });
-    },
-    onError: (error) => {
-      notifications.show({
-        title: "Error",
-        message: error.message,
-        color: "red",
-      });
-    },
-  });
-
   const handleSubmit = () => {
     if (!postId) return;
 
@@ -145,18 +95,6 @@ const PostDetail = () => {
     formData.append("comment_type", "text");
 
     mutate({ postId: post!.id, formData });
-  };
-
-  const handleDelete = (commentId: number) => {
-    confirmationModal(
-      "Delete your comment",
-      "Are you sure you want to delete this comment? This action is irreversible.",
-      () => deleteCommentFn({ postId: post!.id, commentId })
-    );
-  };
-
-  const handleLike = (commentId: number) => {
-    like({ postId: post!.id, commentId });
   };
 
   const comments = data?.pages.flatMap((page) => page.results) || [];
@@ -214,37 +152,11 @@ const PostDetail = () => {
         {comments.length > 0 && <Divider mb="md" />}
 
         {/* Fetched comments */}
-        {comments.map((comment) => (
-          <Card radius="md" withBorder p="md" key={comment.id}>
-            <Group align="start" gap="xs">
-              {/* Avatar */}
-              <Link to={`/home/profile/${comment.author.id}`}>
-                <Avatar radius="xl" />
-              </Link>
-
-              <Flex direction="column" className="flex-1">
-                <PostHeader
-                  author={comment.author}
-                  isAuthor={authenticatedUser.id === comment.author.id}
-                  onDelete={() => handleDelete(comment.id)}
-                  createdAt={comment.created_at}
-                />
-
-                {/* Comment Content */}
-                <Text mt="sm">{comment.content}</Text>
-
-                <Divider my="sm" />
-
-                <LikeButton
-                  likeCount={comment.like_count}
-                  onClick={() => handleLike(comment.id)}
-                  isLiked={comment.is_liked}
-                  disabled={isLiking}
-                />
-              </Flex>
-            </Group>
-          </Card>
-        ))}
+        <Stack gap="xs">
+          {comments.map((comment) => (
+            <Comment comment={comment} postId={postId!} key={comment.id} />
+          ))}
+        </Stack>
 
         {comments.length > 0 && hasNextPage && !isFetchingNextPage && (
           <ActionIcon
