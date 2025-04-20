@@ -19,6 +19,7 @@ import { createPost } from "../api/post";
 const NewPost = () => {
   const [text, setText] = useState("");
   const [image, setImage] = useState<File | null>(null);
+  const [video, setVideo] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const imgRef = useRef<HTMLInputElement | null>(null);
   const [privacy, setPrivacy] = useState("public");
@@ -48,11 +49,17 @@ const NewPost = () => {
     },
   });
 
-  const handleImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImage(file);
       setPreview(URL.createObjectURL(file));
+      if (file.type.startsWith("image/")) {
+        setImage(file);
+        setVideo(null);
+      } else if (file.type.startsWith("video/")) {
+        setVideo(file);
+        setImage(null);
+      }
     }
   };
 
@@ -63,6 +70,9 @@ const NewPost = () => {
     if (image) {
       formData.append("post_type", "image");
       formData.append("media_files", image);
+    } else if (video) {
+      formData.append("post_type", "video");
+      formData.append("media_files", video);
     }
 
     post(formData);
@@ -93,7 +103,11 @@ const NewPost = () => {
                   setPreview(null);
                 }}
               />
-              <Image src={preview} radius="md" />
+              {video ? (
+                <video src={preview} controls className="w-full rounded-md" />
+              ) : (
+                <Image src={preview} radius="md" />
+              )}
             </div>
           )}
 
@@ -110,10 +124,10 @@ const NewPost = () => {
               </ActionIcon>
               <input
                 type="file"
-                accept="image/*"
+                accept="image/*, video/*"
                 hidden
                 ref={imgRef}
-                onChange={handleImgChange}
+                onChange={handleMediaChange}
               />
               <ActionIcon
                 variant="transparent"
@@ -133,7 +147,7 @@ const NewPost = () => {
             <Button
               radius="xl"
               variant="outline"
-              disabled={!text && !image}
+              disabled={!text && !image && !video}
               loading={isPending}
               onClick={handleSubmit}
             >
