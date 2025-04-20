@@ -13,6 +13,7 @@ import { GoogleButton } from "../components/GoogleButton";
 import { useForm, isEmail } from "@mantine/form";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { useEffect } from "react";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -43,7 +44,13 @@ const Signup = () => {
     },
   });
 
-  const { signup, isSigningUp } = useAuth();
+  const { signup, isSigningUp, authenticatedUser } = useAuth();
+
+  useEffect(() => {
+    if (authenticatedUser) {
+      navigate("/home");
+    }
+  }, [authenticatedUser, navigate]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
