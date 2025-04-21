@@ -31,10 +31,12 @@ const Post = ({ post }: PostProps) => {
 
   const isAuthor = post.author.id === authenticatedUser?.id;
 
-  const firstMedia =
-    post.media && post.media.length > 0 ? post.media[0].url : null;
-  const isImage = firstMedia && /\.(jpg|jpeg|png|gif)$/i.test(firstMedia);
-  const isVideo = firstMedia && /\.(mp4|mov|webm)$/i.test(firstMedia);
+  const firstMediaItem = post.media?.[0];
+  const firstMediaUrl = firstMediaItem?.url;
+  const mediaType = firstMediaItem?.media_type;
+
+  const isImage = mediaType === "image";
+  const isVideo = mediaType === "video";
 
   const queryClient = useQueryClient();
   const { mutate: like, isPending: isLiking } = useMutation({
@@ -88,7 +90,7 @@ const Post = ({ post }: PostProps) => {
 
           {isImage && (
             <Image
-              src={firstMedia}
+              src={firstMediaUrl}
               alt="Post media"
               fit="contain"
               radius="md"
@@ -99,7 +101,7 @@ const Post = ({ post }: PostProps) => {
 
           {isVideo && (
             <video controls className="rounded-md mt-2 w-full">
-              <source src={firstMedia} type="video/mp4" />
+              <source src={firstMediaUrl} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           )}
