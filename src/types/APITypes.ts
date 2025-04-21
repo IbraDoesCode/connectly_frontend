@@ -21,7 +21,7 @@ export interface Post {
   author: Author;
   content: string;
   post_type: "text" | "image" | "video";
-  media?: { url: string }[];
+  media?: { url: string; media_type: "image" | "video" }[];
   privacy_type: "public" | "followers" | "private";
   created_at: string;
   is_liked: boolean;
