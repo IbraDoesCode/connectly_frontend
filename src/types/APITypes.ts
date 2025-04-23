@@ -8,6 +8,8 @@ export interface Profile {
   posts_count: number;
   followers: number;
   following: number;
+  profile_image?: string;
+  cover_image?: string;
 }
 
 export interface Author {
