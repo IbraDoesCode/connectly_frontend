@@ -1,4 +1,14 @@
-import { Avatar, Button, Card, Group, Stack, Text, Title } from "@mantine/core";
+import {
+  ActionIcon,
+  Avatar,
+  Box,
+  Button,
+  Card,
+  Group,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { IconArrowLeft, IconCalendar, IconEdit } from "@tabler/icons-react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -50,35 +60,41 @@ const Profile = () => {
         </Group>
 
         {/* Cover Image */}
-        <div className="relative">
-          <Card
-            withBorder
-            radius="md"
-            style={{ position: "relative", overflow: "hidden" }}
-          >
-            <img
-              alt="Cover"
-              style={{
-                width: "100%",
-                height: 200,
-                objectFit: "cover",
-              }}
-            />
-            {isMyProfile && (
-              <Button
-                size="xs"
-                radius="xl"
-                variant="light"
-                style={{ position: "absolute", top: 10, right: 10 }}
-              >
-                <IconEdit size={16} />
-              </Button>
-            )}
-          </Card>
-        </div>
+        <Card
+          withBorder
+          radius="md"
+          pos="relative"
+          style={{ overflow: "hidden" }}
+        >
+          <img
+            alt="Cover"
+            style={{
+              width: "100%",
+              height: 200,
+              objectFit: "cover",
+            }}
+          />
+          {isMyProfile && (
+            <ActionIcon
+              variant="transparent"
+              pos="absolute"
+              top={10}
+              right={10}
+            >
+              <IconEdit size={16} />
+            </ActionIcon>
+          )}
+        </Card>
 
         {/* Avatar & Info */}
-        <Avatar size={80} radius="xl" my="md" />
+
+        <Box pos="relative">
+          <Avatar size={80} radius="xl" my="md" />
+          <ActionIcon variant="transparent" pos="absolute" top={10} left={60}>
+            <IconEdit size={16} />
+          </ActionIcon>
+        </Box>
+
         <Group justify="space-between" px={4}>
           <Stack gap={0}>
             <Text size="xl" fw={700}>
