@@ -13,7 +13,7 @@ export interface Profile {
 }
 
 export interface Author {
-  id: string;
+  id: number;
   username: string;
   full_name: string;
   profile_image?: string;
