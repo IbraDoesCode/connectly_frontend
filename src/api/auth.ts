@@ -1,8 +1,9 @@
+import { Profile } from "../types/APITypes";
 import { LoginData, SignupData } from "../types/AuthTypes";
 import client from "./client";
 
 export const getAuthUser = async () => {
-  const res = await client.get("/profiles/me/");
+  const res = await client.get<Profile>("/profiles/me/");
   return res.data;
 };
 
