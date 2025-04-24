@@ -76,7 +76,7 @@ const Comment = ({ comment, postId }: CommentProps) => {
       <Group align="start" gap="xs">
         {/* Avatar */}
         <Link to={`/home/profile/${comment.author.id}`}>
-          <Avatar radius="xl" />
+          <Avatar radius="xl" src={comment.author.profile_image} />
         </Link>
 
         <Flex direction="column" className="flex-1">
