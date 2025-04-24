@@ -73,7 +73,7 @@ const Post = ({ post }: PostProps) => {
       <Group align="start" gap="xs">
         {/* Avatar */}
         <Link to={`/home/profile/${post.author.id}`}>
-          <Avatar radius="xl" />
+          <Avatar radius="xl" src={post.author.profile_image} />
         </Link>
 
         <Flex direction="column" className="flex-1">
