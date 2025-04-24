@@ -11,23 +11,40 @@ import {
 } from "@mantine/core";
 import { IconArrowLeft, IconCalendar, IconEdit } from "@tabler/icons-react";
 import { Link, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { getProfileById } from "../api/profiles";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getProfileById, updateProfile } from "../api/profiles";
 import { useFollow } from "../hooks/useFollow";
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Feed from "../components/Feed";
+import { useAuth } from "../hooks/useAuth";
 
 const Profile = () => {
   const { userId } = useParams();
   const { follow } = useFollow();
+  const { authenticatedUser } = useAuth();
+
+  const coverImageRef = useRef<HTMLInputElement | null>(null);
+  const [coverImagePreview, setCoverImagePreview] = useState<string | null>(
+    null
+  );
+
+  const profileImageRef = useRef<HTMLInputElement | null>(null);
+  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
+    null
+  );
 
   const [isFollowing, setIsFollowing] = useState(false);
-  const isMyProfile = userId === "me";
+  const isMyProfile = userId === "me" || authenticatedUser.id == userId;
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile", userId],
     queryFn: () => getProfileById(userId!),
     enabled: !!userId,
+  });
+
+  const { mutate } = useMutation({
+    mutationKey: ["profile", userId],
+    mutationFn: updateProfile,
   });
 
   useEffect(() => {
@@ -42,6 +59,32 @@ const Profile = () => {
     month: "long",
     year: "numeric",
   });
+
+  const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setCoverImagePreview(URL.createObjectURL(file));
+
+      if (!userId) return;
+
+      const formData = new FormData();
+      formData.append("cover_image", file);
+      mutate({ userId, formData });
+    }
+  };
+
+  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfileImagePreview(URL.createObjectURL(file));
+
+      if (!userId) return;
+
+      const formData = new FormData();
+      formData.append("profile_image", file);
+      mutate({ userId, formData });
+    }
+  };
 
   return (
     <>
@@ -64,10 +107,12 @@ const Profile = () => {
           withBorder
           radius="md"
           pos="relative"
+          p={0}
           style={{ overflow: "hidden" }}
         >
           <img
-            alt="Cover"
+            src={coverImagePreview || profile.cover_image}
+            alt="cover"
             style={{
               width: "100%",
               height: 200,
@@ -80,19 +125,47 @@ const Profile = () => {
               pos="absolute"
               top={10}
               right={10}
+              onClick={() => coverImageRef.current?.click()}
             >
               <IconEdit size={16} />
             </ActionIcon>
           )}
+          <input
+            type="file"
+            accept="image/*"
+            hidden
+            ref={coverImageRef}
+            onChange={handleCoverImageChange}
+          />
         </Card>
 
         {/* Avatar & Info */}
 
         <Box pos="relative">
-          <Avatar size={80} radius="xl" my="md" />
-          <ActionIcon variant="transparent" pos="absolute" top={10} left={60}>
-            <IconEdit size={16} />
-          </ActionIcon>
+          <Avatar
+            size={80}
+            radius="xl"
+            my="md"
+            src={profileImagePreview || profile.profile_image}
+          />
+          {isMyProfile && (
+            <ActionIcon
+              variant="transparent"
+              pos="absolute"
+              top={10}
+              left={60}
+              onClick={() => profileImageRef.current?.click()}
+            >
+              <IconEdit size={16} />
+            </ActionIcon>
+          )}
+          <input
+            type="file"
+            accept="image/*"
+            hidden
+            ref={profileImageRef}
+            onChange={handleProfileImageChange}
+          />
         </Box>
 
         <Group justify="space-between" px={4}>
