@@ -29,7 +29,7 @@ const RightPanel = () => {
                 className="flex gap-2 items-center cursor-pointer"
                 onClick={() => navigate(`/home/profile/${profile.id}/`)}
               >
-                <Avatar size="md" />
+                <Avatar size="md" src={profile.profile_image} />
                 <div className="flex flex-col">
                   <span className="font-semibold tracking-tight truncate w-28">
                     {profile.full_name}
