@@ -15,6 +15,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import { createPost } from "../api/post";
+import { useAuth } from "../hooks/useAuth";
 
 const NewPost = () => {
   const [text, setText] = useState("");
@@ -25,6 +26,7 @@ const NewPost = () => {
   const [privacy, setPrivacy] = useState("public");
 
   const queryClient = useQueryClient();
+  const { authenticatedUser } = useAuth();
 
   const { mutate: post, isPending } = useMutation({
     mutationFn: createPost,
@@ -82,7 +84,7 @@ const NewPost = () => {
     <Card className="border border-gray-700 rounded-md p-4" mt="md">
       <Group align="start" gap="sm">
         {/* Avatar */}
-        <Avatar radius="xl" />
+        <Avatar radius="xl" src={authenticatedUser?.profile_image} />
         <div className="flex flex-col flex-1">
           {/* Text Input */}
           <Textarea
