@@ -111,7 +111,11 @@ const Profile = () => {
           style={{ overflow: "hidden" }}
         >
           <img
-            src={coverImagePreview || profile.cover_image}
+            src={
+              isMyProfile
+                ? coverImagePreview || profile.cover_image
+                : profile.cover_image
+            }
             alt="cover"
             style={{
               width: "100%",
@@ -146,7 +150,11 @@ const Profile = () => {
             size={80}
             radius="xl"
             my="md"
-            src={profileImagePreview || profile.profile_image}
+            src={
+              isMyProfile
+                ? profileImagePreview || profile.profile_image
+                : profile.profile_image
+            }
           />
           {isMyProfile && (
             <ActionIcon
