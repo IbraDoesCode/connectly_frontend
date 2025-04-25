@@ -1,7 +1,7 @@
 import { Avatar, Button, Card } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { getSuggestedProfilesApi } from "../api/profiles";
+import { getSuggestedProfiles } from "../api/profiles";
 import { Profile } from "../types/APITypes";
 import { useFollow } from "../hooks/useFollow";
 
@@ -10,7 +10,7 @@ const RightPanel = () => {
 
   const { data } = useQuery({
     queryKey: ["suggested-profiles"],
-    queryFn: getSuggestedProfilesApi,
+    queryFn: getSuggestedProfiles,
   });
 
   const { follow, isFollowing } = useFollow();
