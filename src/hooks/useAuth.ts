@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { signup, login, logout, getAuthUser } from "../api/auth";
+import { signup, login, logout } from "../api/auth";
 import { AxiosError } from "axios";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "react-router-dom";
+import { getProfileById } from "../api/profiles";
 
 export const useAuth = () => {
   const navigate = useNavigate();
@@ -85,7 +86,7 @@ export const useAuth = () => {
 
   const { data: authenticatedUser } = useQuery({
     queryKey: ["authenticatedUser"],
-    queryFn: getAuthUser,
+    queryFn: () => getProfileById("me"),
     enabled: !!localStorage.getItem("access"),
   });
 
