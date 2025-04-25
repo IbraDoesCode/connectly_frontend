@@ -1,7 +1,7 @@
 import { FollowStatusResponse, Profile } from "../types/APITypes";
 import client from "./client";
 
-export const getSuggestedProfilesApi = async () => {
+export const getSuggestedProfiles = async () => {
   const res = await client.get<Profile[]>("/profiles/suggestions/");
 
   return res.data;
