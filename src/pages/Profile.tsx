@@ -34,7 +34,7 @@ const Profile = () => {
   );
 
   const [isFollowing, setIsFollowing] = useState(false);
-  const isMyProfile = userId === "me" || authenticatedUser.id == userId;
+  const isMyProfile = userId === "me" || authenticatedUser?.id == userId;
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile", userId],
