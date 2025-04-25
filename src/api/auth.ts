@@ -1,11 +1,5 @@
-import { Profile } from "../types/APITypes";
 import { LoginData, SignupData } from "../types/AuthTypes";
 import client from "./client";
-
-export const getAuthUser = async () => {
-  const res = await client.get<Profile>("/profiles/me/");
-  return res.data;
-};
 
 export const login = async (loginData: LoginData) => {
   const res = await client.post("/token/", loginData);
