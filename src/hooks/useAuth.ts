@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { signup, login, logout } from "../api/auth";
+import { signup, login, logout, googleLogin } from "../api/auth";
 import { AxiosError } from "axios";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "react-router-dom";
@@ -90,13 +90,32 @@ export const useAuth = () => {
     enabled: !!localStorage.getItem("access"),
   });
 
+  const googleLoginMutation = useMutation({
+    mutationFn: googleLogin,
+    onSuccess: () => {
+      notifications.show({
+        title: "Authentication",
+        message: "Google login success!",
+        color: "green",
+      });
+      navigate("/home");
+    },
+    onError: (error: AxiosError<{ detail?: string }>) => {
+      notifications.show({
+        title: "Authentication",
+        message: error.response?.data?.detail || "Google login failed",
+        color: "red",
+      });
+    },
+  });
+
   return {
     login: loginMutation.mutate,
     isLoggingIn: loginMutation.isPending,
     signup: signupMutation.mutate,
     isSigningUp: signupMutation.isPending,
     logout: logoutMutation.mutate,
-
+    googleLogin: googleLoginMutation.mutate,
     authenticatedUser,
   };
 };
