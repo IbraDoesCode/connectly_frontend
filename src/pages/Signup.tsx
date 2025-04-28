@@ -2,18 +2,18 @@ import {
   Anchor,
   Button,
   Divider,
-  Group,
   Paper,
   PasswordInput,
   Stack,
   Text,
   TextInput,
 } from "@mantine/core";
-import { GoogleButton } from "../components/GoogleButton";
 import { useForm, isEmail } from "@mantine/form";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useEffect } from "react";
+import { GoogleLogin } from "@react-oauth/google";
+import { notifications } from "@mantine/notifications";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ const Signup = () => {
     },
   });
 
-  const { signup, isSigningUp, authenticatedUser } = useAuth();
+  const { signup, isSigningUp, authenticatedUser, googleLogin } = useAuth();
 
   useEffect(() => {
     if (authenticatedUser) {
@@ -71,22 +71,12 @@ const Signup = () => {
   return (
     <div className="flex flex-col justify-center items-center h-screen">
       <Paper w={420} radius="md" p="xl" withBorder>
-        <Text size="lg" fw={500}>
-          Welcome to Connectly, Sign up with{" "}
-        </Text>
-
-        <Group grow mb="md" mt="md">
-          <GoogleButton radius="xl">Google</GoogleButton>
-        </Group>
-
-        <Divider
-          label="Or continue with email"
-          labelPosition="center"
-          my="lg"
-        />
-
         <form onSubmit={handleSubmit}>
           <Stack>
+            <Text size="lg" fw={600} ta="center">
+              Connectly — Join today.
+            </Text>
+
             <TextInput
               required
               label="Full name"
@@ -137,22 +127,47 @@ const Signup = () => {
               }
               radius="md"
             />
+
+            <Button
+              variant="outline"
+              type="submit"
+              radius="lg"
+              loading={isSigningUp}
+            >
+              Sign Up
+            </Button>
           </Stack>
-          <Group justify="space-between" mt="xl">
+
+          <Divider label="or" labelPosition="center" my="lg" />
+
+          <Stack gap="lg">
+            <GoogleLogin
+              onSuccess={(credentialResponse) => {
+                if (credentialResponse) {
+                  googleLogin(credentialResponse.credential!);
+                }
+              }}
+              onError={() => {
+                notifications.show({
+                  title: "Authentication",
+                  message: "Google login failed",
+                });
+              }}
+              text="continue_with"
+              shape="pill"
+            />
+
             <Anchor
               component="button"
               type="button"
               c="dimmed"
               onClick={() => navigate("/")}
               size="xs"
+              ta="start"
             >
               Already have an account? Login
             </Anchor>
-
-            <Button type="submit" radius="xl" loading={isSigningUp}>
-              Sign Up
-            </Button>
-          </Group>
+          </Stack>
         </form>
       </Paper>
     </div>
