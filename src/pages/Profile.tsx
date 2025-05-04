@@ -1,37 +1,30 @@
 import {
-  ActionIcon,
   Avatar,
   Box,
   Button,
   Card,
+  Container,
   Group,
+  Image,
   Stack,
   Text,
   Title,
 } from "@mantine/core";
-import { IconArrowLeft, IconCalendar, IconEdit } from "@tabler/icons-react";
+import { IconArrowLeft, IconCalendar } from "@tabler/icons-react";
 import { Link, useParams } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { getProfileById, updateProfile } from "../api/profiles";
+import { useQuery } from "@tanstack/react-query";
+import { getProfileById } from "../api/profiles";
 import { useFollow } from "../hooks/useFollow";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Feed from "../components/Feed";
 import { useAuth } from "../hooks/useAuth";
+import { modals } from "@mantine/modals";
+import EditProfileModal from "../components/modals/EditProfileModal";
 
 const Profile = () => {
   const { userId } = useParams();
   const { follow } = useFollow();
   const { authenticatedUser } = useAuth();
-
-  const coverImageRef = useRef<HTMLInputElement | null>(null);
-  const [coverImagePreview, setCoverImagePreview] = useState<string | null>(
-    null
-  );
-
-  const profileImageRef = useRef<HTMLInputElement | null>(null);
-  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
-    null
-  );
 
   const [isFollowing, setIsFollowing] = useState(false);
   const isMyProfile = userId === "me" || authenticatedUser?.id == userId;
@@ -40,11 +33,6 @@ const Profile = () => {
     queryKey: ["profile", userId],
     queryFn: () => getProfileById(userId!),
     enabled: !!userId,
-  });
-
-  const { mutate } = useMutation({
-    mutationKey: ["profile", userId],
-    mutationFn: updateProfile,
   });
 
   useEffect(() => {
@@ -59,32 +47,6 @@ const Profile = () => {
     month: "long",
     year: "numeric",
   });
-
-  const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setCoverImagePreview(URL.createObjectURL(file));
-
-      if (!userId) return;
-
-      const formData = new FormData();
-      formData.append("cover_image", file);
-      mutate({ userId, formData });
-    }
-  };
-
-  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setProfileImagePreview(URL.createObjectURL(file));
-
-      if (!userId) return;
-
-      const formData = new FormData();
-      formData.append("profile_image", file);
-      mutate({ userId, formData });
-    }
-  };
 
   return (
     <>
@@ -103,77 +65,19 @@ const Profile = () => {
         </Group>
 
         {/* Cover Image */}
-        <Card
-          withBorder
-          radius="md"
-          pos="relative"
-          p={0}
-          style={{ overflow: "hidden" }}
-        >
-          <img
-            src={
-              isMyProfile
-                ? coverImagePreview || profile.cover_image
-                : profile.cover_image
-            }
-            alt="cover"
-            style={{
-              width: "100%",
-              height: 200,
-              objectFit: "cover",
-            }}
+        <Container w="100%" pos="relative" p={0} style={{ overflow: "hidden" }}>
+          <Image
+            src={profile.cover_image}
+            w="100%"
+            h={200}
+            fit="cover"
+            fallbackSrc="https://placehold.co/600x400?text=Cover"
           />
-          {isMyProfile && (
-            <ActionIcon
-              variant="transparent"
-              pos="absolute"
-              top={10}
-              right={10}
-              onClick={() => coverImageRef.current?.click()}
-            >
-              <IconEdit size={16} />
-            </ActionIcon>
-          )}
-          <input
-            type="file"
-            accept="image/*"
-            hidden
-            ref={coverImageRef}
-            onChange={handleCoverImageChange}
-          />
-        </Card>
+        </Container>
 
         {/* Avatar & Info */}
-
         <Box pos="relative">
-          <Avatar
-            size={80}
-            radius="xl"
-            my="md"
-            src={
-              isMyProfile
-                ? profileImagePreview || profile.profile_image
-                : profile.profile_image
-            }
-          />
-          {isMyProfile && (
-            <ActionIcon
-              variant="transparent"
-              pos="absolute"
-              top={10}
-              left={60}
-              onClick={() => profileImageRef.current?.click()}
-            >
-              <IconEdit size={16} />
-            </ActionIcon>
-          )}
-          <input
-            type="file"
-            accept="image/*"
-            hidden
-            ref={profileImageRef}
-            onChange={handleProfileImageChange}
-          />
+          <Avatar size={80} radius="xl" my="md" src={profile.profile_image} />
         </Box>
 
         <Group justify="space-between" px={4}>
@@ -186,8 +90,21 @@ const Profile = () => {
             </Text>
           </Stack>
 
-          {/* Follow Button */}
-          {!isMyProfile && (
+          {isMyProfile ? (
+            <Button
+              size="sm"
+              variant="outline"
+              radius="xl"
+              onClick={() =>
+                modals.open({
+                  title: "Edit Profile",
+                  children: <EditProfileModal profile={profile} />,
+                })
+              }
+            >
+              Edit
+            </Button>
+          ) : (
             <Button
               size="sm"
               variant="outline"
