@@ -1,7 +1,7 @@
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 
-const confirmationModal = (
+const ConfirmationModal = (
   title: string,
   message: string,
   onConfirm: () => void
@@ -14,4 +14,4 @@ const confirmationModal = (
   });
 };
 
-export default confirmationModal;
+export default ConfirmationModal;
