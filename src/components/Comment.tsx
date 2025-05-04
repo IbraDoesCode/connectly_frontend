@@ -7,7 +7,7 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteComment, likeComment } from "../api/post";
 import { useAuth } from "../hooks/useAuth";
-import confirmationModal from "./modals/confirmationModal";
+import ConfirmationModal from "./modals/ConfirmationModal";
 
 interface CommentProps {
   comment: IComment;
@@ -64,7 +64,7 @@ const Comment = ({ comment, postId }: CommentProps) => {
   };
 
   const handleDelete = (commentId: number) => {
-    confirmationModal(
+    ConfirmationModal(
       "Delete your comment",
       "Are you sure you want to delete this comment? This action is irreversible.",
       () => deleteCommentFn({ postId: Number(postId), commentId })
@@ -82,7 +82,7 @@ const Comment = ({ comment, postId }: CommentProps) => {
         <Flex direction="column" className="flex-1">
           <PostHeader
             author={comment.author}
-            isAuthor={authenticatedUser.id === comment.author.id}
+            isAuthor={authenticatedUser?.id === comment.author.id}
             onDelete={() => handleDelete(comment.id)}
             createdAt={comment.created_at}
           />

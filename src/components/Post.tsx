@@ -18,7 +18,7 @@ import { useAuth } from "../hooks/useAuth";
 import { notifications } from "@mantine/notifications";
 import PostHeader from "./PostHeader";
 import LikeButton from "./LikeButton";
-import confirmationModal from "./modals/confirmationModal";
+import ConfirmationModal from "./modals/ConfirmationModal";
 
 interface PostProps {
   post: PostType;
@@ -61,7 +61,7 @@ const Post = ({ post }: PostProps) => {
   });
 
   const handleDelete = (postId: number) => {
-    confirmationModal(
+    ConfirmationModal(
       "Delete your post",
       "Are you sure you want to delete this post? This action is irreversible.",
       () => mutate(postId)
