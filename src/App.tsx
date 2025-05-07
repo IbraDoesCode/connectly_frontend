@@ -6,6 +6,7 @@ import PostDetail from "./pages/PostDetail";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ProtectedRoutes from "./routes/ProtectedRoutes";
+import CompleteSignup from "./pages/CompleteSignup";
 
 const App = () => {
   return (
@@ -13,6 +14,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/complete-signup" element={<CompleteSignup />} />
         <Route path="/home" element={<ProtectedRoutes />}>
           <Route element={<Layout />}>
             <Route index element={<Home />} />
