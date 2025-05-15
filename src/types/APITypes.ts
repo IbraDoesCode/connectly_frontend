@@ -57,3 +57,9 @@ export interface FollowStatusResponse {
 export interface LikeStatusResponse {
   liked: boolean;
 }
+
+export interface GoogleLoginResponse {
+  access?: string;
+  refresh?: string;
+  signup_complete?: boolean;
+}
