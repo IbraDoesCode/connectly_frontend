@@ -1,9 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { signup, login, logout, googleLogin } from "../api/auth";
+import {
+  signup,
+  login,
+  logout,
+  verifyGoogleToken,
+  completeSignUp,
+} from "../api/auth";
 import { AxiosError } from "axios";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "react-router-dom";
 import { getProfileById } from "../api/profiles";
+import { googleLogout } from "@react-oauth/google";
 
 export const useAuth = () => {
   const navigate = useNavigate();
@@ -72,6 +79,7 @@ export const useAuth = () => {
         message: "Logout success!",
         color: "green",
       });
+      googleLogout();
       queryClient.clear();
       navigate("/");
     },
@@ -91,19 +99,42 @@ export const useAuth = () => {
   });
 
   const googleLoginMutation = useMutation({
-    mutationFn: googleLogin,
-    onSuccess: () => {
-      notifications.show({
-        title: "Authentication",
-        message: "Google login success!",
-        color: "green",
-      });
-      navigate("/home");
+    mutationFn: verifyGoogleToken,
+    onSuccess: (data, variables) => {
+      if (data.signup_complete == false) {
+        navigate("/complete-signup", { state: { token: variables } });
+      } else {
+        notifications.show({
+          title: "Authentication",
+          message: "Google login success!",
+          color: "green",
+        });
+        navigate("/home");
+      }
     },
     onError: (error: AxiosError<{ detail?: string }>) => {
       notifications.show({
         title: "Authentication",
         message: error.response?.data?.detail || "Google login failed",
+        color: "red",
+      });
+    },
+  });
+
+  const completeSignupMutation = useMutation({
+    mutationFn: completeSignUp,
+    onSuccess: () => {
+      notifications.show({
+        title: "Authentication",
+        message: "Sign up success!",
+        color: "green",
+      });
+      navigate("/home");
+    },
+    onError: (error) => {
+      notifications.show({
+        title: "Authentication",
+        message: error.message,
         color: "red",
       });
     },
@@ -117,5 +148,7 @@ export const useAuth = () => {
     logout: logoutMutation.mutate,
     googleLogin: googleLoginMutation.mutate,
     authenticatedUser,
+    completeSignUp: completeSignupMutation.mutate,
+    isCompletingSignup: completeSignupMutation.isPending,
   };
 };
