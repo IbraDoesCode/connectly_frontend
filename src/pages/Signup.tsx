@@ -140,34 +140,32 @@ const Signup = () => {
 
           <Divider label="or" labelPosition="center" my="lg" />
 
-          <Stack gap="lg">
-            <GoogleLogin
-              onSuccess={(credentialResponse) => {
-                if (credentialResponse) {
-                  googleLogin(credentialResponse.credential!);
-                }
-              }}
-              onError={() => {
-                notifications.show({
-                  title: "Authentication",
-                  message: "Google login failed",
-                });
-              }}
-              text="continue_with"
-              shape="pill"
-            />
+          <GoogleLogin
+            onSuccess={(credentialResponse) => {
+              if (credentialResponse) {
+                googleLogin(credentialResponse.credential!);
+              }
+            }}
+            onError={() => {
+              notifications.show({
+                title: "Authentication",
+                message: "Google login failed",
+              });
+            }}
+            text="continue_with"
+          />
 
-            <Anchor
-              component="button"
-              type="button"
-              c="dimmed"
-              onClick={() => navigate("/")}
-              size="xs"
-              ta="start"
-            >
-              Already have an account? Login
-            </Anchor>
-          </Stack>
+          <Anchor
+            component="button"
+            type="button"
+            c="dimmed"
+            onClick={() => navigate("/")}
+            size="xs"
+            ta="start"
+            mt="lg"
+          >
+            Already have an account? Login
+          </Anchor>
         </form>
       </Paper>
     </div>
