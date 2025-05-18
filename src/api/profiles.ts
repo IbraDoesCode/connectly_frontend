@@ -1,4 +1,8 @@
-import { FollowStatusResponse, Profile } from "../types/APITypes";
+import {
+  FollowListResponse,
+  FollowStatusResponse,
+  Profile,
+} from "../types/APITypes";
 import client from "./client";
 
 export const getSuggestedProfiles = async () => {
@@ -32,6 +36,23 @@ export const updateProfile = async ({
 export const followUser = async (userId: number) => {
   const res = await client.post<FollowStatusResponse>(
     `profiles/${userId}/follow/`
+  );
+
+  return res.data;
+};
+
+export const getFollowList = async ({
+  userId,
+  type,
+}: {
+  userId: number;
+  type: "followers" | "following";
+}) => {
+  const res = await client.get<FollowListResponse>(
+    `profiles/${userId}/follow/`,
+    {
+      params: { type: type },
+    }
   );
 
   return res.data;
