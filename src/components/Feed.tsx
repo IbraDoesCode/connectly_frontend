@@ -15,6 +15,7 @@ interface FeedProps {
 const Feed = ({ feedType, userId }: FeedProps) => {
   const {
     data,
+    isError,
     error,
     isLoading,
     fetchNextPage,
@@ -51,14 +52,6 @@ const Feed = ({ feedType, userId }: FeedProps) => {
   // Flatten all pages into a single array of posts
   const posts = data?.pages.flatMap((page) => page.results) || [];
 
-  if (error) {
-    return (
-      <Text c="red" ta="center">
-        Error loading feed: {error.message}
-      </Text>
-    );
-  }
-
   return (
     <div className="relative">
       {isLoading && (
@@ -67,7 +60,13 @@ const Feed = ({ feedType, userId }: FeedProps) => {
         </Center>
       )}
 
-      <Stack mt="md">
+      {isError && (
+        <Text c="red" size="lg" ta="center">
+          Error loading feed: {error.message}
+        </Text>
+      )}
+
+      <Stack>
         {posts.length > 0 ? (
           <>
             {posts.map((post) => (
