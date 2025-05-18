@@ -63,3 +63,5 @@ export interface GoogleLoginResponse {
   refresh?: string;
   signup_complete?: boolean;
 }
+
+export type FollowListResponse = Author[];
